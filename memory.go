@@ -100,6 +100,7 @@ func (b *MemoryBackend) Head() *node {
 }
 
 type event int
+
 const (
 	eventFlush event = iota
 	eventStop
@@ -108,14 +109,14 @@ const (
 // ChannelMemoryBackend is very similar to the MemoryBackend, except that it
 // internally utilizes a channel.
 type ChannelMemoryBackend struct {
-	maxSize int
-	size int
-	incoming chan *Record
-	events chan event
-	mu sync.Mutex
-	running bool
-	flushWg sync.WaitGroup
-	stopWg sync.WaitGroup
+	maxSize    int
+	size       int
+	incoming   chan *Record
+	events     chan event
+	mu         sync.Mutex
+	running    bool
+	flushWg    sync.WaitGroup
+	stopWg     sync.WaitGroup
 	head, tail *node
 }
 
@@ -125,9 +126,9 @@ type ChannelMemoryBackend struct {
 // Start will automatically be called by this function.
 func NewChannelMemoryBackend(size int) *ChannelMemoryBackend {
 	backend := &ChannelMemoryBackend{
-		maxSize: size,
+		maxSize:  size,
 		incoming: make(chan *Record, 1024),
-		events: make(chan event),
+		events:   make(chan event),
 	}
 	backend.Start()
 	return backend

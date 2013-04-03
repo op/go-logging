@@ -11,7 +11,6 @@ import (
 	"testing"
 )
 
-
 func TestLogCalldepth(t *testing.T) {
 	buf := &bytes.Buffer{}
 	SetBackend(NewLogBackend(buf, "", log.Lshortfile))

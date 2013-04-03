@@ -51,10 +51,10 @@ func (b *multiLogger) SetLevel(level Level, module string) {
 
 // IsEnabledFor returns true if any of the backends are enabled for it.
 func (b *multiLogger) IsEnabledFor(level Level, module string) bool {
-       for _, backend := range b.backends {
-               if backend.IsEnabledFor(level, module) {
-                       return true
-               }
-       }
-       return false
+	for _, backend := range b.backends {
+		if backend.IsEnabledFor(level, module) {
+			return true
+		}
+	}
+	return false
 }
