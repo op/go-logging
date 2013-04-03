@@ -8,7 +8,7 @@ import (
 	stdlog "log"
 	"os"
 
-	"github.com/op/gologging"
+	"github.com/op/go-logging"
 )
 
 var log = logging.MustGetLogger("test")
