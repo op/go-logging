@@ -7,7 +7,6 @@ package logging
 import (
 	"sync"
 	"sync/atomic"
-	"time"
 	"unsafe"
 )
 
@@ -152,24 +151,15 @@ func (b *ChannelMemoryBackend) process() {
 	for {
 		select {
 		case rec := <-b.incoming:
-			prev := b.tail
-			b.tail = &node{Record: rec}
-			if prev == nil {
-				b.head = b.tail
-			} else {
-				prev.next = b.tail
-			}
-
-			if b.maxSize > 0 && b.size >= b.maxSize {
-				b.head = b.head.next
-			} else {
-				b.size += 1
-			}
+			b.insertRecord(rec)
 		case e := <-b.events:
 			switch e {
 			case eventStop:
 				break
 			case eventFlush:
+				for len(b.incoming) > 0 {
+					b.insertRecord(<-b.incoming)
+				}
 				b.flushWg.Done()
 			}
 		}
@@ -177,12 +167,24 @@ func (b *ChannelMemoryBackend) process() {
 	b.stopWg.Done()
 }
 
+func (b *ChannelMemoryBackend) insertRecord(rec *Record) {
+	prev := b.tail
+	b.tail = &node{Record: rec}
+	if prev == nil {
+		b.head = b.tail
+	} else {
+		prev.next = b.tail
+	}
+
+	if b.maxSize > 0 && b.size >= b.maxSize {
+		b.head = b.head.next
+	} else {
+		b.size += 1
+	}
+}
+
 // Flush waits until all records in the buffered channel have been processed.
 func (b *ChannelMemoryBackend) Flush() {
-	// TODO is there a way to force the order in the above select statement?
-	// this is very ugly and a quick hack.
-	time.Sleep(10 * time.Nanosecond)
-
 	b.flushWg.Add(1)
 	b.events <- eventFlush
 	b.flushWg.Wait()
