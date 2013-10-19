@@ -23,7 +23,10 @@ func MultiLogger(backends ...Backend) LeveledBackend {
 func (b *multiLogger) Log(level Level, calldepth int, rec *Record) (err error) {
 	for _, backend := range b.backends {
 		if backend.IsEnabledFor(level, rec.Module) {
-			if e := backend.Log(level, calldepth+1, rec); e != nil {
+			// Shallow copy of the record for the formatted cache on Record and get the
+			// record formatter from the backend.
+			r2 := *rec
+			if e := backend.Log(level, calldepth+1, &r2); e != nil {
 				err = e
 			}
 		}

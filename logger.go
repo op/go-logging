@@ -8,7 +8,9 @@
 package logging
 
 import (
+	"bytes"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 	"sync/atomic"
@@ -27,8 +29,13 @@ func Redact(s string) string {
 	return strings.Repeat("*", len(s))
 }
 
-// Sequence number is incremented and utilized for all log records created.
-var sequenceNo uint64
+var (
+	// Sequence number is incremented and utilized for all log records created.
+	sequenceNo uint64
+
+	// timeNow is a customizable for testing purposes.
+	timeNow = time.Now
+)
 
 // Record represents a log record and contains the timestamp when the record
 // was created, an increasing id, filename and line and finally the actual
@@ -37,22 +44,38 @@ type Record struct {
 	Id        uint64
 	Time      time.Time
 	Module    string
-	fmt       string
+	Level     Level
+
+	// message is kept as a pointer to have shallow copies update this once
+	// needed.
+	message   *string
 	args      []interface{}
+	fmt       string
+	formatter Formatter
 	formatted string
 }
 
 func (r *Record) Formatted() string {
 	if r.formatted == "" {
+		var buf bytes.Buffer
+		r.formatter.Format(r, &buf)
+		r.formatted = buf.String()
+	}
+	return r.formatted
+}
+
+func (r *Record) Message() string {
+	if r.message == nil {
 		// Redact the arguments that implements the Redactor interface
 		for i, arg := range r.args {
 			if redactor, ok := arg.(Redactor); ok == true {
 				r.args[i] = redactor.Redacted()
 			}
 		}
-		r.formatted = fmt.Sprintf(r.fmt, r.args...)
+		msg := fmt.Sprintf(r.fmt, r.args...)
+		r.message = &msg
 	}
-	return r.formatted
+	return *r.message
 }
 
 type Logger struct {
@@ -62,7 +85,7 @@ type Logger struct {
 // TODO call NewLogger and remove MustGetLogger?
 // GetLogger creates and returns a Logger object based on the module name.
 func GetLogger(module string) (*Logger, error) {
-	return &Logger{module}, nil
+	return &Logger{Module: module}, nil
 }
 
 // MustGetLogger is like GetLogger but panics if the logger can't be created.
@@ -75,15 +98,32 @@ func MustGetLogger(module string) *Logger {
 	return logger
 }
 
-// InitForTesting is a convenient method when using logging in a test.
+// Reset restores the internal state of the logging library.
+func Reset() {
+	// TODO make a global Init() method to be less magic? or make it such that
+	// if there's no backends at all configured, we could use some tricks to
+	// automatically setup backends based if we have a TTY or not.
+	sequenceNo = 0
+	b := SetBackend(NewLogBackend(os.Stderr, "", log.LstdFlags))
+	b.SetLevel(DEBUG, "")
+	SetFormatter(DefaultFormatter)
+	timeNow = time.Now
+}
+
+// InitForTesting is a convenient method when using logging in a test. Once
+// called, the time will be frozen to January 1, 1970 UTC.
 func InitForTesting(level Level) *MemoryBackend {
+	Reset()
+
 	memoryBackend := NewMemoryBackend(10240)
 
 	leveledBackend := AddModuleLevel(memoryBackend)
 	leveledBackend.SetLevel(level, "")
 	SetBackend(leveledBackend)
 
-	sequenceNo = 0
+	timeNow = func() time.Time {
+		return time.Unix(0, 0).UTC()
+	}
 	return memoryBackend
 }
 
@@ -96,8 +136,9 @@ func (l *Logger) log(lvl Level, format string, args ...interface{}) {
 	// Create the logging record and pass it in to the backend
 	record := &Record{
 		Id:     atomic.AddUint64(&sequenceNo, 1),
-		Time:   time.Now(),
+		Time:   timeNow(),
 		Module: l.Module,
+		Level:  lvl,
 		fmt:    format,
 		args:   args,
 	}
@@ -162,4 +203,8 @@ func (l *Logger) Info(format string, args ...interface{}) {
 // Debug logs a message using DEBUG as log level.
 func (l *Logger) Debug(format string, args ...interface{}) {
 	l.log(DEBUG, format, args...)
+}
+
+func init() {
+	Reset()
 }

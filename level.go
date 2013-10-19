@@ -7,6 +7,7 @@ package logging
 import (
 	"errors"
 	"strings"
+	"sync"
 )
 
 var ErrInvalidLogLevel = errors.New("logger: invalid log level")
@@ -63,6 +64,8 @@ type LeveledBackend interface {
 type moduleLeveled struct {
 	levels  map[string]Level
 	backend Backend
+	formatter Formatter
+	once sync.Once
 }
 
 // AddModuleLevel wraps a log backend with knobs to have different log levels
@@ -104,7 +107,17 @@ func (l *moduleLeveled) IsEnabledFor(level Level, module string) bool {
 
 func (l *moduleLeveled) Log(level Level, calldepth int, rec *Record) (err error) {
 	if l.IsEnabledFor(level, rec.Module) {
+		rec.formatter = l.getFormatterAndCacheCurrent()
 		err = l.backend.Log(level, calldepth+1, rec)
 	}
 	return
+}
+
+func (l *moduleLeveled) getFormatterAndCacheCurrent() Formatter {
+	l.once.Do(func() {
+		if l.formatter == nil {
+			l.formatter = getFormatter()
+		}
+	})
+	return l.formatter
 }

@@ -26,7 +26,10 @@ import "github.com/op/go-logging"
 var log = logging.MustGetLogger("package.example")
 
 func main() {
+	var format = logging.MustStringFormatter("%{level} %{message}")
+	logging.SetFormatter(format)
 	logging.SetLevel(logging.INFO, "package.example")
+
 	log.Debug("hello %s", "golang")
 	log.Info("hello %s", "golang")
 }
