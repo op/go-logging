@@ -52,6 +52,7 @@ package main
 
 import (
 	stdlog "log"
+	"log/syslog"
 	"os"
 
 	"github.com/op/go-logging"
@@ -73,7 +74,7 @@ func main() {
 	logBackend := logging.NewLogBackend(os.Stderr, "", stdlog.LstdFlags|stdlog.Lshortfile)
 	logBackend.Color = true
 
-	syslogBackend, err := logging.NewSyslogBackend("")
+	syslogBackend, err := logging.NewSyslogBackend("", syslog.LOG_DEBUG|syslog.LOG_LOCAL0)
 	if err != nil {
 		log.Fatal(err)
 	}

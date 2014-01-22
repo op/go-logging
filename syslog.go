@@ -17,7 +17,7 @@ type SyslogBackend struct {
 // NewSyslogBackend connects to the syslog daemon using UNIX sockets with the
 // given prefix. If prefix is not given, the prefix will be derived from the
 // launched command.
-func NewSyslogBackend(prefix string) (b *SyslogBackend, err error) {
+func NewSyslogBackend(prefix string, Priority syslog.Priority) (b *SyslogBackend, err error) {
 	var w *syslog.Writer
 	w, err = syslog.New(syslog.LOG_CRIT, prefix)
 	return &SyslogBackend{w}, err
