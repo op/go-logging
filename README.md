@@ -6,6 +6,11 @@ Package logging implements a logging infrastructure for Go. It supports
 different logging backends like syslog, file and memory. Multiple backends
 can be utilized with different log levels per backend and logger.
 
+## Forked
+
+This is a forked version. There are couple minor changes here which I'll
+eventually open a MR for.
+
 ## Installing
 
 ### Using *go get*
