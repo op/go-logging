@@ -45,9 +45,9 @@ func (b *LogBackend) Log(level Level, calldepth int, rec *Record) error {
 		buf.Write([]byte(colors[level]))
 		buf.Write([]byte(rec.Formatted()))
 		buf.Write([]byte("\033[0m"))
-		return b.Logger.Output(calldepth+1, buf.String())
+		return b.Logger.Output(calldepth+2, buf.String())
 	} else {
-		return b.Logger.Output(calldepth+1, rec.Formatted())
+		return b.Logger.Output(calldepth+2, rec.Formatted())
 	}
 	panic("should not be reached")
 }
