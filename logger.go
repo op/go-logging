@@ -41,10 +41,10 @@ var (
 // was created, an increasing id, filename and line and finally the actual
 // formatted log line.
 type Record struct {
-	Id        uint64
-	Time      time.Time
-	Module    string
-	Level     Level
+	Id     uint64
+	Time   time.Time
+	Module string
+	Level  Level
 
 	// message is kept as a pointer to have shallow copies update this once
 	// needed.
