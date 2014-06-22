@@ -90,7 +90,7 @@ func main() {
 		log.Warning("warning")
 		log.Notice("notice")
 		log.Info("info")
-		log.Debug("debug %s", Password("secret"))
+		log.Debugf("debug %s", Password("secret"))
 	}
 }
 ```
