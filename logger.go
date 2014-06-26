@@ -145,7 +145,7 @@ func (l *Logger) log(lvl Level, format string, args ...interface{}) {
 
 	// TODO use channels to fan out the records to all backends?
 	// TODO in case of errors, do something (tricky)
-	defaultBackend.Log(lvl, 3, record)
+	defaultBackend.Log(lvl, 2, record)
 }
 
 // Fatal is equivalent to l.Critical(fmt.Sprint()) followed by a call to os.Exit(1).
