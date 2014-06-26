@@ -56,9 +56,13 @@ type Record struct {
 }
 
 func (r *Record) Formatted() string {
+	return r.FormattedWithCallDepth(3)
+}
+
+func (r *Record) FormattedWithCallDepth(calldepth int) string {
 	if r.formatted == "" {
 		var buf bytes.Buffer
-		r.formatter.Format(r, &buf)
+		r.formatter.Format(calldepth, r, &buf)
 		r.formatted = buf.String()
 	}
 	return r.formatted

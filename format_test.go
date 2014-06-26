@@ -12,7 +12,7 @@ import (
 func TestFormat(t *testing.T) {
 	backend := InitForTesting(DEBUG)
 
-	f, err := NewStringFormatter("%{time:2006-01-02T15:04:05} %{level:.1s} %{id:04d} %{module} %{message}")
+	f, err := NewStringFormatter("%{shortfile} %{time:2006-01-02T15:04:05} %{level:.1s} %{id:04d} %{module} %{message}")
 	if err != nil {
 		t.Fatalf("failed to set format: %s", err)
 	}
@@ -22,7 +22,7 @@ func TestFormat(t *testing.T) {
 	log.Debug("hello")
 
 	line := MemoryRecordN(backend, 0).Formatted()
-	if "1970-01-01T00:00:00 D 0001 module hello" != line {
+	if "format_test.go:24 1970-01-01T00:00:00 D 0001 module hello" != line {
 		t.Errorf("Unexpected format: %s", line)
 	}
 }
@@ -39,7 +39,7 @@ func BenchmarkStringFormatter(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		if err := f.Format(record, buf); err != nil {
+		if err := f.Format(1, record, buf); err != nil {
 			b.Fatal(err)
 			buf.Truncate(0)
 		}

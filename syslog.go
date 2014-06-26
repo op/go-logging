@@ -31,7 +31,7 @@ func NewSyslogBackendPriority(prefix string, priority syslog.Priority) (b *Syslo
 	return &SyslogBackend{w}, err
 }
 
-func (b *SyslogBackend) Log(level Level, calldepth int, rec *Record) error {
+func (b *SyslogBackend) Log(level Level, rec *Record) error {
 	switch level {
 	case CRITICAL:
 		return b.Writer.Crit(rec.Formatted())
