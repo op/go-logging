@@ -21,7 +21,7 @@ func TestFormat(t *testing.T) {
 	log := MustGetLogger("module")
 	log.Debug("hello")
 
-	line := MemoryRecordN(backend, 0).Formatted()
+	line := MemoryRecordN(backend, 0).Formatted(0)
 	if "format_test.go:24 1970-01-01T00:00:00 D 0001 module hello" != line {
 		t.Errorf("Unexpected format: %s", line)
 	}

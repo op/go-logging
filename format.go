@@ -233,7 +233,7 @@ func (f *stringFormatter) Format(calldepth int, r *Record, output io.Writer) err
 				v = r.Message()
 				break
 			case fmtVerbLongfile, fmtVerbShortfile:
-				_, file, line, ok := runtime.Caller(calldepth)
+				_, file, line, ok := runtime.Caller(calldepth + 1)
 				if !ok {
 					file = "???"
 					line = 0

@@ -31,20 +31,21 @@ func NewSyslogBackendPriority(prefix string, priority syslog.Priority) (b *Syslo
 	return &SyslogBackend{w}, err
 }
 
-func (b *SyslogBackend) Log(level Level, rec *Record) error {
+func (b *SyslogBackend) Log(level Level, calldepth int, rec *Record) error {
+	line := rec.Formatted(calldepth + 1)
 	switch level {
 	case CRITICAL:
-		return b.Writer.Crit(rec.Formatted())
+		return b.Writer.Crit(line)
 	case ERROR:
-		return b.Writer.Err(rec.Formatted())
+		return b.Writer.Err(line)
 	case WARNING:
-		return b.Writer.Warning(rec.Formatted())
+		return b.Writer.Warning(line)
 	case NOTICE:
-		return b.Writer.Notice(rec.Formatted())
+		return b.Writer.Notice(line)
 	case INFO:
-		return b.Writer.Info(rec.Formatted())
+		return b.Writer.Info(line)
 	case DEBUG:
-		return b.Writer.Debug(rec.Formatted())
+		return b.Writer.Debug(line)
 	default:
 	}
 	panic("unhandled log level")

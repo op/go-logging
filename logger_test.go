@@ -30,7 +30,7 @@ func TestRedact(t *testing.T) {
 	password := Password("123456")
 	log := MustGetLogger("test")
 	log.Debug("foo %s", password)
-	if "foo ******" != MemoryRecordN(backend, 0).Formatted() {
+	if "foo ******" != MemoryRecordN(backend, 0).Formatted(0) {
 		t.Errorf("redacted line: %v", MemoryRecordN(backend, 0))
 	}
 }
