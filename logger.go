@@ -145,6 +145,9 @@ func (l *Logger) log(lvl Level, format string, args ...interface{}) {
 
 	// TODO use channels to fan out the records to all backends?
 	// TODO in case of errors, do something (tricky)
+
+	// calldepth=2 brings the stack up to the caller of the level
+	// methods, Info(), Fatal(), etc.
 	defaultBackend.Log(lvl, 2, record)
 }
 
