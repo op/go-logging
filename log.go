@@ -43,11 +43,13 @@ func (b *LogBackend) Log(level Level, calldepth int, rec *Record) error {
 	if b.Color {
 		buf := &bytes.Buffer{}
 		buf.Write([]byte(colors[level]))
-		buf.Write([]byte(rec.Formatted()))
+		buf.Write([]byte(rec.Formatted(calldepth + 1)))
 		buf.Write([]byte("\033[0m"))
-		return b.Logger.Output(calldepth+1, buf.String())
+		// For some reason, the Go logger arbitrarily decided "2" was the correct
+		// call depth...
+		return b.Logger.Output(calldepth+2, buf.String())
 	} else {
-		return b.Logger.Output(calldepth+1, rec.Formatted())
+		return b.Logger.Output(calldepth+2, rec.Formatted(calldepth+1))
 	}
 	panic("should not be reached")
 }

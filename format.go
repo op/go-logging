@@ -9,7 +9,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"path/filepath"
 	"regexp"
+	"runtime"
 	"sync"
 	"time"
 )
@@ -26,6 +28,8 @@ const (
 	fmtVerbId
 	fmtVerbModule
 	fmtVerbMessage
+	fmtVerbLongfile
+	fmtVerbShortfile
 
 	// Keep last, there are no match for these below.
 	fmtVerbUnknown
@@ -38,12 +42,16 @@ var fmtVerbs = []string{
 	"id",
 	"module",
 	"message",
+	"longfile",
+	"shortfile",
 }
 
 var defaultVerbsLayout = []string{
 	"2006-01-02T15:04:05.999Z-07:00",
 	"s",
 	"d",
+	"s",
+	"s",
 	"s",
 	"s",
 }
@@ -59,7 +67,7 @@ func getFmtVerbByName(name string) fmtVerb {
 
 // Formatter is the required interface for a custom log record formatter.
 type Formatter interface {
-	Format(*Record, io.Writer) error
+	Format(calldepth int, r *Record, w io.Writer) error
 }
 
 // formatter is used by all backends unless otherwise overriden.
@@ -112,11 +120,13 @@ type stringFormatter struct {
 // The verbs:
 //
 // General:
-//     %{id}      Sequence number for log message (uint64).
-//     %{time}    Time when log occurred (time.Time)
-//     %{level}   Log level (Level)
-//     %{module}  Module (string)
-//     %{message} Message (string)
+//     %{id}        Sequence number for log message (uint64).
+//     %{time}      Time when log occurred (time.Time)
+//     %{level}     Log level (Level)
+//     %{module}    Module (string)
+//     %{message}   Message (string)
+//     %{longfile}  Full file name and line number: /a/b/c/d.go:23
+//     %{shortfile} Final file name element and line number: d.go:23
 //
 // For normal types, the output can be customized by using the 'verbs' defined
 // in the fmt package, eg. '%{id:04d}' to make the id output be '%04d' as the
@@ -177,7 +187,7 @@ func NewStringFormatter(format string) (*stringFormatter, error) {
 		fmt:    "hello %s",
 		args:   []interface{}{"go"},
 	}
-	if err := fmter.Format(r, &bytes.Buffer{}); err != nil {
+	if err := fmter.Format(0, r, &bytes.Buffer{}); err != nil {
 		return nil, err
 	}
 
@@ -200,7 +210,7 @@ func (f *stringFormatter) add(verb fmtVerb, layout string) {
 	f.parts = append(f.parts, part{verb, layout})
 }
 
-func (f *stringFormatter) Format(r *Record, output io.Writer) error {
+func (f *stringFormatter) Format(calldepth int, r *Record, output io.Writer) error {
 	// TODO collect and call fprintf once?
 	for _, part := range f.parts {
 		if part.verb == fmtVerbStatic {
@@ -222,6 +232,15 @@ func (f *stringFormatter) Format(r *Record, output io.Writer) error {
 			case fmtVerbMessage:
 				v = r.Message()
 				break
+			case fmtVerbLongfile, fmtVerbShortfile:
+				_, file, line, ok := runtime.Caller(calldepth + 1)
+				if !ok {
+					file = "???"
+					line = 0
+				} else if part.verb == fmtVerbShortfile {
+					file = filepath.Base(file)
+				}
+				v = fmt.Sprintf("%s:%d", file, line)
 			default:
 				panic("unhandled format part")
 			}

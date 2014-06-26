@@ -55,10 +55,10 @@ type Record struct {
 	formatted string
 }
 
-func (r *Record) Formatted() string {
+func (r *Record) Formatted(calldepth int) string {
 	if r.formatted == "" {
 		var buf bytes.Buffer
-		r.formatter.Format(r, &buf)
+		r.formatter.Format(calldepth+1, r, &buf)
 		r.formatted = buf.String()
 	}
 	return r.formatted
@@ -145,7 +145,10 @@ func (l *Logger) log(lvl Level, format string, args ...interface{}) {
 
 	// TODO use channels to fan out the records to all backends?
 	// TODO in case of errors, do something (tricky)
-	defaultBackend.Log(lvl, 3, record)
+
+	// calldepth=2 brings the stack up to the caller of the level
+	// methods, Info(), Fatal(), etc.
+	defaultBackend.Log(lvl, 2, record)
 }
 
 // Fatal is equivalent to l.Critical(fmt.Sprint()) followed by a call to os.Exit(1).
