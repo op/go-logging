@@ -114,7 +114,6 @@ func SetFormatter(f Formatter) {
 	formatter.def = f
 }
 
-// TODO use ${} instead?
 var formatRe *regexp.Regexp = regexp.MustCompile(`%{([a-z]+)(?::(.*?[^\\]))?}`)
 
 type part struct {
@@ -227,7 +226,6 @@ func (f *stringFormatter) add(verb fmtVerb, layout string) {
 }
 
 func (f *stringFormatter) Format(calldepth int, r *Record, output io.Writer) error {
-	// TODO collect and call fprintf once?
 	for _, part := range f.parts {
 		if part.verb == fmtVerbStatic {
 			output.Write([]byte(part.layout))
