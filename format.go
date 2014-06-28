@@ -51,8 +51,10 @@ var fmtVerbs = []string{
 	"shortfile",
 }
 
+const rfc3339Milli = "2006-01-02T15:04:05.999Z07:00"
+
 var defaultVerbsLayout = []string{
-	"2006-01-02T15:04:05.999Z07:00",
+	rfc3339Milli,
 	"s",
 	"d",
 	"d",
