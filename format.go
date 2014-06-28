@@ -47,7 +47,7 @@ var fmtVerbs = []string{
 }
 
 var defaultVerbsLayout = []string{
-	"2006-01-02T15:04:05.999Z-07:00",
+	"2006-01-02T15:04:05.999Z07:00",
 	"s",
 	"d",
 	"s",
