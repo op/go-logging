@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -26,6 +27,8 @@ const (
 	fmtVerbTime fmtVerb = iota
 	fmtVerbLevel
 	fmtVerbId
+	fmtVerbPid
+	fmtVerbProgram
 	fmtVerbModule
 	fmtVerbMessage
 	fmtVerbLongfile
@@ -40,6 +43,8 @@ var fmtVerbs = []string{
 	"time",
 	"level",
 	"id",
+	"pid",
+	"program",
 	"module",
 	"message",
 	"longfile",
@@ -50,11 +55,18 @@ var defaultVerbsLayout = []string{
 	"2006-01-02T15:04:05.999Z07:00",
 	"s",
 	"d",
+	"d",
+	"s",
 	"s",
 	"s",
 	"s",
 	"s",
 }
+
+var (
+	pid     = os.Getpid()
+	program = filepath.Base(os.Args[0])
+)
 
 func getFmtVerbByName(name string) fmtVerb {
 	for i, verb := range fmtVerbs {
@@ -121,9 +133,11 @@ type stringFormatter struct {
 //
 // General:
 //     %{id}        Sequence number for log message (uint64).
+//     %{pid}       Process id (int)
 //     %{time}      Time when log occurred (time.Time)
 //     %{level}     Log level (Level)
 //     %{module}    Module (string)
+//     %{program}   Basename of os.Args[0] (string)
 //     %{message}   Message (string)
 //     %{longfile}  Full file name and line number: /a/b/c/d.go:23
 //     %{shortfile} Final file name element and line number: d.go:23
@@ -225,6 +239,12 @@ func (f *stringFormatter) Format(calldepth int, r *Record, output io.Writer) err
 				break
 			case fmtVerbId:
 				v = r.Id
+				break
+			case fmtVerbPid:
+				v = pid
+				break
+			case fmtVerbProgram:
+				v = program
 				break
 			case fmtVerbModule:
 				v = r.Module
