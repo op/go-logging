@@ -33,6 +33,7 @@ const (
 	fmtVerbMessage
 	fmtVerbLongfile
 	fmtVerbShortfile
+	fmtVerbLevelColor
 
 	// Keep last, there are no match for these below.
 	fmtVerbUnknown
@@ -49,6 +50,7 @@ var fmtVerbs = []string{
 	"message",
 	"longfile",
 	"shortfile",
+	"color",
 }
 
 const rfc3339Milli = "2006-01-02T15:04:05.999Z07:00"
@@ -63,6 +65,7 @@ var defaultVerbsLayout = []string{
 	"s",
 	"s",
 	"s",
+	"",
 }
 
 var (
@@ -173,12 +176,12 @@ func NewStringFormatter(format string) (*stringFormatter, error) {
 		}
 
 		// Handle layout customizations or use the default. If this is not for the
-		// time formatting, we need to prefix with %.
+		// time or color formatting, we need to prefix with %.
 		layout := defaultVerbsLayout[verb]
 		if m[4] != -1 {
 			layout = format[m[4]:m[5]]
 		}
-		if verb != fmtVerbTime {
+		if verb != fmtVerbTime && verb != fmtVerbLevelColor {
 			layout = "%" + layout
 		}
 
@@ -231,6 +234,14 @@ func (f *stringFormatter) Format(calldepth int, r *Record, output io.Writer) err
 			output.Write([]byte(part.layout))
 		} else if part.verb == fmtVerbTime {
 			output.Write([]byte(r.Time.Format(part.layout)))
+		} else if part.verb == fmtVerbLevelColor {
+			if part.layout == "bold" {
+				output.Write([]byte(boldcolors[r.Level]))
+			} else if part.layout == "reset" {
+				output.Write([]byte("\033[0m"))
+			} else {
+				output.Write([]byte(colors[r.Level]))
+			}
 		} else {
 			var v interface{}
 			switch part.verb {
