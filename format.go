@@ -33,6 +33,7 @@ const (
 	fmtVerbMessage
 	fmtVerbLongfile
 	fmtVerbShortfile
+	fmtVerbLevelColor
 
 	// Keep last, there are no match for these below.
 	fmtVerbUnknown
@@ -49,6 +50,7 @@ var fmtVerbs = []string{
 	"message",
 	"longfile",
 	"shortfile",
+	"color",
 }
 
 const rfc3339Milli = "2006-01-02T15:04:05.999Z07:00"
@@ -63,6 +65,7 @@ var defaultVerbsLayout = []string{
 	"s",
 	"s",
 	"s",
+	"",
 }
 
 var (
@@ -142,6 +145,7 @@ type stringFormatter struct {
 //     %{message}   Message (string)
 //     %{longfile}  Full file name and line number: /a/b/c/d.go:23
 //     %{shortfile} Final file name element and line number: d.go:23
+//     %{color}     ANSI color based on log level
 //
 // For normal types, the output can be customized by using the 'verbs' defined
 // in the fmt package, eg. '%{id:04d}' to make the id output be '%04d' as the
@@ -149,6 +153,14 @@ type stringFormatter struct {
 //
 // For time.Time, use the same layout as time.Format to change the time format
 // when output, eg "2006-01-02T15:04:05.999Z-07:00".
+//
+// For the 'color' verb, the output can be adjusted to either use bold colors,
+// i.e., '%{color:bold}' or to reset the ANSI attributes, i.e.,
+// '%{color:reset}' Note that if you use the color verb explicitly, be sure to
+// reset it or else the color state will persist past your log message.  e.g.,
+// "%{color:bold}%{time:15:04:05} %{level:-8s}%{color:reset} %{message}" will
+// just colorize the time and level, leaving the message uncolored
+
 func NewStringFormatter(format string) (*stringFormatter, error) {
 	var fmter = &stringFormatter{}
 
@@ -173,12 +185,12 @@ func NewStringFormatter(format string) (*stringFormatter, error) {
 		}
 
 		// Handle layout customizations or use the default. If this is not for the
-		// time formatting, we need to prefix with %.
+		// time or color formatting, we need to prefix with %.
 		layout := defaultVerbsLayout[verb]
 		if m[4] != -1 {
 			layout = format[m[4]:m[5]]
 		}
-		if verb != fmtVerbTime {
+		if verb != fmtVerbTime && verb != fmtVerbLevelColor {
 			layout = "%" + layout
 		}
 
@@ -231,6 +243,14 @@ func (f *stringFormatter) Format(calldepth int, r *Record, output io.Writer) err
 			output.Write([]byte(part.layout))
 		} else if part.verb == fmtVerbTime {
 			output.Write([]byte(r.Time.Format(part.layout)))
+		} else if part.verb == fmtVerbLevelColor {
+			if part.layout == "bold" {
+				output.Write([]byte(boldcolors[r.Level]))
+			} else if part.layout == "reset" {
+				output.Write([]byte("\033[0m"))
+			} else {
+				output.Write([]byte(colors[r.Level]))
+			}
 		} else {
 			var v interface{}
 			switch part.verb {

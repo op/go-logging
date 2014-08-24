@@ -67,7 +67,7 @@ func (p Password) Redacted() interface{} {
 
 func main() {
 	// Customize the output format
-	logging.SetFormatter(logging.MustStringFormatter("▶ %{level:.1s} 0x%{id:x} %{message}"))
+	logging.SetFormatter(logging.MustStringFormatter("▶ %{color}%{level:.1s}%{color:reset} 0x%{id:x} %{message}"))
 
 	// Setup one stdout and one syslog backend.
 	logBackend := logging.NewLogBackend(os.Stderr, "", stdlog.LstdFlags|stdlog.Lshortfile)
