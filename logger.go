@@ -78,19 +78,49 @@ func (r *Record) Message() string {
 	return *r.message
 }
 
+type LevelLogger interface {
+	// a logging.LevelLogger is also a standardlog.Logger
+	Fatal(v ...interface{})
+	Fatalf(format string, v ...interface{})
+	Fatalln(v ...interface{})
+	Panic(v ...interface{})
+	Panicf(format string, v ...interface{})
+	Panicln(v ...interface{})
+	Print(v ...interface{})
+	Printf(format string, v ...interface{})
+	Println(v ...interface{})
+
+	// Go1 details of log.Logger that don't seem appropriate to
+	// the abstract notion of logging
+	Output(calldepth int, s string) error
+	Prefix() string
+	Flags() int
+	SetFlags(flag int)
+	SetPrefix(prefix string)
+
+	// and then we have our own goodies
+
+	Debug(format string, args ...interface{})
+	Info(format string, args ...interface{})
+	Notice(format string, args ...interface{})
+	Error(format string, args ...interface{})
+	Critical(format string, args ...interface{})
+}
+	
 type Logger struct {
-	Module string
+	Module		string
+	flags		int
 }
 
 // TODO call NewLogger and remove MustGetLogger?
 // GetLogger creates and returns a Logger object based on the module name.
-func GetLogger(module string) (*Logger, error) {
+func GetLogger(module string) (LevelLogger, error) {
 	return &Logger{Module: module}, nil
 }
 
 // MustGetLogger is like GetLogger but panics if the logger can't be created.
 // It simplifies safe initialization of a global logger for eg. a package.
-func MustGetLogger(module string) *Logger {
+func MustGetLogger(module string) LevelLogger {
 	logger, err := GetLogger(module)
 	if err != nil {
 		panic("logger: " + module + ": " + err.Error())
@@ -151,6 +181,54 @@ func (l *Logger) log(lvl Level, format string, args ...interface{}) {
 	defaultBackend.Log(lvl, 2, record)
 }
 
+func (l *Logger) Print(v ...interface{}) {
+	l.Output(2, fmt.Sprint(v))
+}
+
+func (l *Logger) Printf(format string, v ...interface{}) {
+	l.Output(2, fmt.Sprintf(format, v))
+}
+
+func (l *Logger) Println(v ...interface{}) {
+	l.Output(2, fmt.Sprintln(v))
+}
+
+func (l *Logger) Output(calldepth int, s string) error {
+	// Create the logging record and pass it in to the backend
+	record := &Record{
+		Id:     atomic.AddUint64(&sequenceNo, 1),
+		Time:   timeNow(),
+		Module: l.Module,
+		Level:  INFO,
+		fmt:    "%s",
+		args:   []interface{}{s},
+	}
+
+	// TODO use channels to fan out the records to all backends?
+	// TODO in case of errors, do something (tricky)
+
+	// calldepth=2 brings the stack up to the caller of the level
+	// methods, Info(), Fatal(), etc.
+	defaultBackend.Log(INFO, calldepth, record)
+	return nil
+}
+
+func (l *Logger) SetFlags(flag int) {
+	l.flags = flag
+}
+
+func (l *Logger) Flags() int {
+	return l.flags
+}
+
+func (l *Logger) SetPrefix(p string) {
+	l.Module = p
+}
+
+func (l *Logger) Prefix() string {
+	return l.Module
+}
+
 // Fatal is equivalent to l.Critical(fmt.Sprint()) followed by a call to os.Exit(1).
 func (l *Logger) Fatal(args ...interface{}) {
 	s := fmt.Sprint(args...)
@@ -164,6 +242,13 @@ func (l *Logger) Fatalf(format string, args ...interface{}) {
 	os.Exit(1)
 }
 
+// Fatalln is equivalent to l.Critical(fmt.Sprintln()) followed by a call to os.Exit(1).
+func (l *Logger) Fatalln(args ...interface{}) {
+	s := fmt.Sprintln(args...)
+	l.log(CRITICAL, "%s", s)
+	os.Exit(1)
+}
+
 // Panic is equivalent to l.Critical(fmt.Sprint()) followed by a call to panic().
 func (l *Logger) Panic(args ...interface{}) {
 	s := fmt.Sprint(args...)
@@ -174,6 +259,13 @@ func (l *Logger) Panic(args ...interface{}) {
 // Panicf is equivalent to l.Critical followed by a call to panic().
 func (l *Logger) Panicf(format string, args ...interface{}) {
 	s := fmt.Sprintf(format, args...)
+	l.log(CRITICAL, "%s", s)
+	panic(s)
+}
+
+// Panicln is equivalent to l.Critical(fmt.Sprintln()) followed by a call to panic().
+func (l *Logger) Panicln(args ...interface{}) {
+	s := fmt.Sprintln(args...)
 	l.log(CRITICAL, "%s", s)
 	panic(s)
 }
