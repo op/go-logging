@@ -32,15 +32,15 @@ func main() {
 	logging.SetBackend(logBackend, syslogBackend)
 	logging.SetFormatter(logging.MustStringFormatter(format))
 
-	// Run one with debug setup for "test" and one with error.
+	// For "example", set the log level to DEBUG and ERROR.
 	for _, level := range []logging.Level{logging.DEBUG, logging.ERROR} {
 		logging.SetLevel(level, "example")
 
-		log.Critical("crit")
-		log.Error("err")
-		log.Warning("warning")
-		log.Notice("notice")
-		log.Info("info")
 		log.Debug("debug %s", Password("secret"))
+		log.Info("info")
+		log.Notice("notice")
+		log.Warning("warning")
+		log.Error("err")
+		log.Critical("crit")
 	}
 }
