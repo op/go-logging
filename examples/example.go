@@ -1,20 +1,3 @@
-## Golang logging library
-
-[![Build Status](https://travis-ci.org/op/go-logging.png)](https://travis-ci.org/op/go-logging)
-
-Package logging implements a logging infrastructure for Go. Its output format
-is customizable and supports different logging backends like syslog, file and
-memory. Multiple backends can be utilized with different log levels per backend
-and logger.
-
-## Example
-
-Let's have a look at an [example](examples/example.go) which demonstrates most
-of the features found in this library.
-
-[![Example Output](examples/example.png)](examples/example.go)
-
-```go
 package main
 
 import (
@@ -61,23 +44,3 @@ func main() {
 		log.Debug("debug %s", Password("secret"))
 	}
 }
-```
-
-## Installing
-
-### Using *go get*
-
-    $ go get github.com/op/go-logging
-
-After this command *go-logging* is ready to use. Its source will be in:
-
-    $GOROOT/src/pkg/github.com/op/go-logging
-
-You can use `go get -u -a` to update all installed packages.
-
-## Documentation
-
-For docs, see http://godoc.org/github.com/op/go-logging or run:
-
-    $ go doc github.com/op/go-logging
-
