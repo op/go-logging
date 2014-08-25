@@ -11,9 +11,9 @@ import (
 	"log"
 )
 
-// TODO make the colorizer a formatter to be able to apply it to all backends
 // TODO initialize here
 var colors []string
+var boldcolors []string
 
 type color int
 
@@ -58,6 +58,10 @@ func colorSeq(color color) string {
 	return fmt.Sprintf("\033[%dm", int(color))
 }
 
+func colorSeqBold(color color) string {
+	return fmt.Sprintf("\033[%d;1m", int(color))
+}
+
 func init() {
 	colors = []string{
 		CRITICAL: colorSeq(colorMagenta),
@@ -65,5 +69,12 @@ func init() {
 		WARNING:  colorSeq(colorYellow),
 		NOTICE:   colorSeq(colorGreen),
 		DEBUG:    colorSeq(colorCyan),
+	}
+	boldcolors = []string{
+		CRITICAL: colorSeqBold(colorMagenta),
+		ERROR:    colorSeqBold(colorRed),
+		WARNING:  colorSeqBold(colorYellow),
+		NOTICE:   colorSeqBold(colorGreen),
+		DEBUG:    colorSeqBold(colorCyan),
 	}
 }
