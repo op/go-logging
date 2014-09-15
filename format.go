@@ -159,8 +159,7 @@ type stringFormatter struct {
 // '%{color:reset}' Note that if you use the color verb explicitly, be sure to
 // reset it or else the color state will persist past your log message.  e.g.,
 // "%{color:bold}%{time:15:04:05} %{level:-8s}%{color:reset} %{message}" will
-// just colorize the time and level, leaving the message uncolored
-
+// just colorize the time and level, leaving the message uncolored.
 func NewStringFormatter(format string) (*stringFormatter, error) {
 	var fmter = &stringFormatter{}
 
