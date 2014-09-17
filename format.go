@@ -10,9 +10,11 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"strings"
 	"sync"
 	"time"
 )
@@ -33,6 +35,10 @@ const (
 	fmtVerbMessage
 	fmtVerbLongfile
 	fmtVerbShortfile
+	fmtVerbLongpkg
+	fmtVerbShortpkg
+	fmtVerbLongfunc
+	fmtVerbShortfunc
 	fmtVerbLevelColor
 
 	// Keep last, there are no match for these below.
@@ -50,6 +56,10 @@ var fmtVerbs = []string{
 	"message",
 	"longfile",
 	"shortfile",
+	"longpkg",
+	"shortpkg",
+	"longfunc",
+	"shortfunc",
 	"color",
 }
 
@@ -60,6 +70,10 @@ var defaultVerbsLayout = []string{
 	"s",
 	"d",
 	"d",
+	"s",
+	"s",
+	"s",
+	"s",
 	"s",
 	"s",
 	"s",
@@ -160,6 +174,16 @@ type stringFormatter struct {
 // reset it or else the color state will persist past your log message.  e.g.,
 // "%{color:bold}%{time:15:04:05} %{level:-8s}%{color:reset} %{message}" will
 // just colorize the time and level, leaving the message uncolored.
+//
+// There's also a couple of experimental 'verbs'. These are exposed to get
+// feedback and needs a bit of tinkering. Hence, they might change in the
+// future.
+//
+// Experimental:
+//     %{longpkg}   Full package path, eg. github.com/go-logging
+//     %{shortpkg}  Base package path, eg. go-logging
+//     %{longfunc}  Full function name, eg. littleEndian.PutUint32
+//     %{shortfunc} Base function name, eg. PutUint32
 func NewStringFormatter(format string) (*stringFormatter, error) {
 	var fmter = &stringFormatter{}
 
@@ -280,6 +304,15 @@ func (f *stringFormatter) Format(calldepth int, r *Record, output io.Writer) err
 					file = filepath.Base(file)
 				}
 				v = fmt.Sprintf("%s:%d", file, line)
+			case fmtVerbLongfunc, fmtVerbShortfunc,
+				fmtVerbLongpkg, fmtVerbShortpkg:
+				// TODO cache pc
+				v = "???"
+				if pc, _, _, ok := runtime.Caller(calldepth + 1); ok {
+					if f := runtime.FuncForPC(pc); f != nil {
+						v = formatFuncName(part.verb, f.Name())
+					}
+				}
 			default:
 				panic("unhandled format part")
 			}
@@ -287,4 +320,30 @@ func (f *stringFormatter) Format(calldepth int, r *Record, output io.Writer) err
 		}
 	}
 	return nil
+}
+
+// formatFuncName tries to extract certain part of the runtime formatted
+// function name to some pre-defined variation.
+//
+// This function is known to not work properly if the package path or name
+// contains a dot.
+func formatFuncName(v fmtVerb, f string) string {
+	i := strings.LastIndex(f, "/")
+	j := strings.Index(f[i+1:], ".")
+	if j < 1 {
+		return "???"
+	}
+	pkg, fun := f[:i+j+1], f[i+j+2:]
+	switch v {
+	case fmtVerbLongpkg:
+		return pkg
+	case fmtVerbShortpkg:
+		return path.Base(pkg)
+	case fmtVerbLongfunc:
+		return fun
+	case fmtVerbShortfunc:
+		i = strings.LastIndex(fun, ".")
+		return fun[i+1:]
+	}
+	panic("unexpected func formatter")
 }

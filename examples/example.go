@@ -11,7 +11,7 @@ var log = logging.MustGetLogger("example")
 // Example format string. Everything except the message has a custom color
 // which is dependent on the log level. Many fields have a custom output
 // formatting too, eg. the time returns the hour down to the milli second.
-var format = "%{color}%{time:15:04:05.000000} ▶ %{level:.4s} %{id:03x}%{color:reset} %{message}"
+var format = "%{color}%{time:15:04:05.000000} %{shortfunc} ▶ %{level:.4s} %{id:03x}%{color:reset} %{message}"
 
 // Password is just an example type implementing the Redactor interface. Any
 // time this is logged, the Redacted() function will be called.
