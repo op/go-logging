@@ -73,11 +73,11 @@ After this command *go-logging* is ready to use. Its source will be in:
 
     $GOROOT/src/pkg/github.com/op/go-logging
 
-You can use `go get -u -a` to update all installed packages.
+You can use `go get -u` to update the package.
 
 ## Documentation
 
 For docs, see http://godoc.org/github.com/op/go-logging or run:
 
-    $ go doc github.com/op/go-logging
+    $ godoc github.com/op/go-logging
 
