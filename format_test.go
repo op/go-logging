@@ -72,7 +72,7 @@ func TestVarFuncFormat(t *testing.T) {
 	}
 
 	line := varFunc()
-	if "???" != line && "TestVarFuncFormat" != line && "varFunc" != line {
+	if "???" == line || "TestVarFuncFormat" == line || "varFunc" == line {
 		t.Errorf("Unexpected format: %s", line)
 	}
 }
