@@ -79,7 +79,14 @@ func (r *Record) Message() string {
 }
 
 type Logger struct {
-	Module string
+	Module      string
+	backend     LeveledBackend
+	haveBackend bool
+}
+
+func (l *Logger) SetBackend(backend LeveledBackend) {
+	l.backend = backend
+	l.haveBackend = true
 }
 
 // TODO call NewLogger and remove MustGetLogger?
@@ -148,6 +155,11 @@ func (l *Logger) log(lvl Level, format string, args ...interface{}) {
 
 	// calldepth=2 brings the stack up to the caller of the level
 	// methods, Info(), Fatal(), etc.
+	if l.haveBackend {
+		l.backend.Log(lvl, 2, record)
+		return
+	}
+
 	defaultBackend.Log(lvl, 2, record)
 }
 
