@@ -241,8 +241,6 @@ func NewStringFormatter(format string) (*stringFormatter, error) {
 		return nil, err
 	}
 
-	formatter.def = fmter
-
 	return fmter, nil
 }
 
