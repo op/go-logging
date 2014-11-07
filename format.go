@@ -345,3 +345,24 @@ func formatFuncName(v fmtVerb, f string) string {
 	}
 	panic("unexpected func formatter")
 }
+
+// backendFormatter combines a backend with a specific formatter making it
+// possible to have different log formats for different backends.
+type backendFormatter struct {
+	b Backend
+	f Formatter
+}
+
+// NewBackendFormatter creates a new backend which makes all records that
+// passes through it beeing formatted by the specific formatter.
+func NewBackendFormatter(b Backend, f Formatter) *backendFormatter {
+	return &backendFormatter{b, f}
+}
+
+// Log implements the Log function required by the Backend interface.
+func (bf *backendFormatter) Log(level Level, calldepth int, r *Record) error {
+	// Make a shallow copy of the record and replace any formatter
+	r2 := *r
+	r2.formatter = bf.f
+	return bf.b.Log(level, calldepth+1, &r2)
+}
