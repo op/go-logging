@@ -28,7 +28,9 @@ var log = logging.MustGetLogger("example")
 // Example format string. Everything except the message has a custom color
 // which is dependent on the log level. Many fields have a custom output
 // formatting too, eg. the time returns the hour down to the milli second.
-var format = "%{color}%{time:15:04:05.000000} ▶ %{level:.4s} %{id:03x}%{color:reset} %{message}"
+var format = logging.MustStringFormatter(
+	"%{color}%{time:15:04:05.000000} %{shortfunc} ▶ %{level:.4s} %{id:03x}%{color:reset} %{message}",
+)
 
 // Password is just an example type implementing the Redactor interface. Any
 // time this is logged, the Redacted() function will be called.
@@ -39,27 +41,28 @@ func (p Password) Redacted() interface{} {
 }
 
 func main() {
-	// Setup one stderr and one syslog backend and combine them both into one
-	// logging backend. By default stderr is used with the standard log flag.
-	logBackend := logging.NewLogBackend(os.Stderr, "", 0)
-	syslogBackend, err := logging.NewSyslogBackend("")
-	if err != nil {
-		log.Fatal(err)
-	}
-	logging.SetBackend(logBackend, syslogBackend)
-	logging.SetFormatter(logging.MustStringFormatter(format))
+	// For demo purposes, create two backend for os.Stderr.
+	backend1 := logging.NewLogBackend(os.Stdout, "", 0)
+	backend2 := logging.NewLogBackend(os.Stdout, "", 0)
 
-	// For "example", set the log level to DEBUG and ERROR.
-	for _, level := range []logging.Level{logging.DEBUG, logging.ERROR} {
-		logging.SetLevel(level, "example")
+	// For messages written to backend2 we want to add some additional
+	// information to the output, including the used log level and the name of
+	// the function.
+	backend2Formatter := logging.NewBackendFormatter(backend2, format)
 
-		log.Debug("debug %s", Password("secret"))
-		log.Info("info")
-		log.Notice("notice")
-		log.Warning("warning")
-		log.Error("err")
-		log.Critical("crit")
-	}
+	// Only errors and more severe messages should be sent to backend1
+	backend1Leveled := logging.AddModuleLevel(backend1)
+	backend1Leveled.SetLevel(logging.ERROR, "")
+
+	// Set the backends to be used.
+	logging.SetBackend(backend1Leveled, backend2Formatter)
+
+	log.Debug("debug %s", Password("secret"))
+	log.Info("info")
+	log.Notice("notice")
+	log.Warning("warning")
+	log.Error("err")
+	log.Critical("crit")
 }
 ```
 
