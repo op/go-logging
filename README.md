@@ -20,7 +20,7 @@ package main
 import (
 	"os"
 
-	"github.com/op/go-logging"
+	logging "github.com/op/go-logging"
 )
 
 var log = logging.MustGetLogger("example")
