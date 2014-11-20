@@ -25,11 +25,15 @@ import (
 
 var log = logging.MustGetLogger("example")
 
+// You can expose logger methods at package level for convenience
+var Info = log.Info
+var Error = log.Error
+
 // Example format string. Everything except the message has a custom color
 // which is dependent on the log level. Many fields have a custom output
 // formatting too, eg. the time returns the hour down to the milli second.
 var format = logging.MustStringFormatter(
-	"%{color}%{time:15:04:05.000000} %{shortfunc} ▶ %{level:.4s} %{id:03x}%{color:reset} %{message}",
+	"%{color}%{time:15:04:05.000} %{shortfunc} ▶ %{level:.4s} %{id:03x}%{color:reset} %{message}",
 )
 
 // Password is just an example type implementing the Redactor interface. Any
@@ -63,6 +67,11 @@ func main() {
 	log.Warning("warning")
 	log.Error("err")
 	log.Critical("crit")
+
+	// Use ExtraCalldepth to ensure proper stack depth when exposing methods
+	Error("Didn't use extra call depth")
+	log.ExtraCalldepth = 1
+	Info("That's better.")
 }
 ```
 

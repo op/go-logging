@@ -79,9 +79,10 @@ func (r *Record) Message() string {
 }
 
 type Logger struct {
-	Module      string
-	backend     LeveledBackend
-	haveBackend bool
+	Module         string
+	backend        LeveledBackend
+	haveBackend    bool
+	ExtraCalldepth int
 }
 
 func (l *Logger) SetBackend(backend LeveledBackend) {
@@ -155,12 +156,14 @@ func (l *Logger) log(lvl Level, format string, args ...interface{}) {
 
 	// calldepth=2 brings the stack up to the caller of the level
 	// methods, Info(), Fatal(), etc.
+	// ExtraCallDepth allows this to be extended further up the stack in case we
+	// are wrapping these methods, eg. to expose them package level
 	if l.haveBackend {
-		l.backend.Log(lvl, 2, record)
+		l.backend.Log(lvl, 2+l.ExtraCalldepth, record)
 		return
 	}
 
-	defaultBackend.Log(lvl, 2, record)
+	defaultBackend.Log(lvl, 2+l.ExtraCalldepth, record)
 }
 
 // Fatal is equivalent to l.Critical(fmt.Sprint()) followed by a call to os.Exit(1).
