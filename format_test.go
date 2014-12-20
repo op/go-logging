@@ -156,7 +156,7 @@ func TestBackendFormatter(t *testing.T) {
 
 	log := MustGetLogger("module")
 	log.Info("foo")
-	if "foo" != getLastLine(b1) {
+	if "1970-01-01 00:00:00 foo" != getLastLine(b1) {
 		t.Errorf("Unexpected line: %s", getLastLine(b1))
 	}
 	if "INFO foo" != getLastLine(b2) {
