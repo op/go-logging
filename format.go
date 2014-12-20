@@ -114,8 +114,8 @@ func getFormatter() Formatter {
 }
 
 var (
-	// DefaultFormatter is the default formatter used and is only the message.
-	DefaultFormatter Formatter = MustStringFormatter("%{message}")
+	// DefaultFormatter is the default formatter used and is the date, time and the message.
+	DefaultFormatter Formatter = MustStringFormatter("%{time:2006-01-02 15:04:05.999} %{message}")
 
 	// Glog format
 	GlogFormatter Formatter = MustStringFormatter("%{level:.1s}%{time:0102 15:04:05.999999} %{pid} %{shortfile}] %{message}")
