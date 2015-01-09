@@ -79,9 +79,12 @@ func (r *Record) Message() string {
 }
 
 type Logger struct {
-	Module         string
-	backend        LeveledBackend
-	haveBackend    bool
+	Module      string
+	backend     LeveledBackend
+	haveBackend bool
+
+	// ExtraCallDepth can be used to add additional call depth when getting the
+	// calling function. This is normally used when wrapping a logger.
 	ExtraCalldepth int
 }
 
