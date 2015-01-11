@@ -84,3 +84,6 @@ For docs, see http://godoc.org/github.com/op/go-logging or run:
 
     $ godoc github.com/op/go-logging
 
+## Additional resources
+
+* [wslog](https://godoc.org/github.com/cryptix/go/logging/wslog) -- exposes log messages through a WebSocket.
