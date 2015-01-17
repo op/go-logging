@@ -8,7 +8,9 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
+	"os"
 )
 
 // TODO initialize here
@@ -60,6 +62,68 @@ func colorSeq(color color) string {
 
 func colorSeqBold(color color) string {
 	return fmt.Sprintf("\033[%d;1m", int(color))
+}
+
+type DefaultLogBackend struct {
+	file *os.File
+	path string
+}
+
+// Create a new backend that uses the default golang logger
+//
+// The default golang logger exposes a SetOutput method which allows us to
+// effectively reopen the log file on demand, whereas a regular golang logger
+// does not. Thus this allows us to use the default logger for that purpose
+func NewDefaultLogBackend(path string, prefix string, flag int) (*DefaultLogBackend, error) {
+	ret := &DefaultLogBackend{
+		path: path,
+	}
+
+	log.SetPrefix(prefix)
+	log.SetFlags(flag)
+
+	err := ret.Reopen()
+	if err != nil {
+		return nil, err
+	}
+
+	return ret, nil
+}
+
+func (f *DefaultLogBackend) Log(level Level, calldepth int, rec *Record) error {
+	log.Print(rec.Formatted(calldepth + 1))
+	return nil
+}
+
+func (f *DefaultLogBackend) Reopen() (err error) {
+	var new_file *os.File
+
+	new_file, err = os.OpenFile(f.path, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0640)
+	if err != nil {
+		return
+	}
+
+	// Switch to new output before closing
+	log.SetOutput(new_file)
+
+	if f.file != nil {
+		f.file.Close()
+	}
+
+	f.file = new_file
+
+	return nil
+}
+
+func (f *DefaultLogBackend) Close() {
+	// Discard logs before closing
+	log.SetOutput(ioutil.Discard)
+
+	if f.file != nil {
+		f.file.Close()
+	}
+
+	f.file = nil
 }
 
 func init() {
