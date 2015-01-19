@@ -34,7 +34,7 @@ func Example() {
 	log.Error("error")
 
 	// Output:
-	// debug arg
-	// error
+	// 1970-01-01 00:00:00 debug arg
+	// 1970-01-01 00:00:00 error
 	// 00:00:00.000 Example E error
 }

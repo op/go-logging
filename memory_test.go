@@ -58,17 +58,17 @@ func TestMemoryBackend(t *testing.T) {
 		t.Errorf("record length: %d", backend.size)
 	}
 	record := MemoryRecordN(backend, 0)
-	if "5" != record.Formatted(0) {
+	if "1970-01-01 00:00:00 5" != record.Formatted(0) {
 		t.Errorf("unexpected start: %s", record.Formatted(0))
 	}
 	for i := 0; i < 8; i++ {
 		record = MemoryRecordN(backend, i)
-		if strconv.Itoa(i+5) != record.Formatted(0) {
+		if "1970-01-01 00:00:00 " + strconv.Itoa(i+5) != record.Formatted(0) {
 			t.Errorf("unexpected record: %v", record.Formatted(0))
 		}
 	}
 	record = MemoryRecordN(backend, 7)
-	if "12" != record.Formatted(0) {
+	if "1970-01-01 00:00:00 12" != record.Formatted(0) {
 		t.Errorf("unexpected end: %s", record.Formatted(0))
 	}
 	record = MemoryRecordN(backend, 8)
@@ -97,17 +97,17 @@ func TestChannelMemoryBackend(t *testing.T) {
 		t.Errorf("record length: %d", backend.size)
 	}
 	record := ChannelMemoryRecordN(backend, 0)
-	if "5" != record.Formatted(0) {
+	if "1970-01-01 00:00:00 5" != record.Formatted(0) {
 		t.Errorf("unexpected start: %s", record.Formatted(0))
 	}
 	for i := 0; i < 8; i++ {
 		record = ChannelMemoryRecordN(backend, i)
-		if strconv.Itoa(i+5) != record.Formatted(0) {
+		if "1970-01-01 00:00:00 " + strconv.Itoa(i+5) != record.Formatted(0) {
 			t.Errorf("unexpected record: %v", record.Formatted(0))
 		}
 	}
 	record = ChannelMemoryRecordN(backend, 7)
-	if "12" != record.Formatted(0) {
+	if "1970-01-01 00:00:00 12" != record.Formatted(0) {
 		t.Errorf("unexpected end: %s", record.Formatted(0))
 	}
 	record = ChannelMemoryRecordN(backend, 8)
