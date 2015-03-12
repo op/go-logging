@@ -102,3 +102,27 @@ func RunLogBenchmark(b *testing.B) {
 		log.Debug("log line for %d and this is rectified: %s", i, password)
 	}
 }
+
+func BenchmarkLogFixed(b *testing.B) {
+	b.StopTimer()
+	backend := SetBackend(NewLogBackend(ioutil.Discard, "", 0))
+	backend.SetLevel(DEBUG, "")
+
+	RunLogBenchmarkFixedString(b)
+}
+
+func BenchmarkLogFixedIgnored(b *testing.B) {
+	b.StopTimer()
+	backend := SetBackend(NewLogBackend(ioutil.Discard, "", 0))
+	backend.SetLevel(INFO, "")
+	RunLogBenchmarkFixedString(b)
+}
+
+func RunLogBenchmarkFixedString(b *testing.B) {
+	log := MustGetLogger("test")
+
+	b.StartTimer()
+	for i := 0; i < b.N; i++ {
+		log.Debug("some random fixed text")
+	}
+}
