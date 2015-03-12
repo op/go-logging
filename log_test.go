@@ -6,6 +6,7 @@ package logging
 
 import (
 	"bytes"
+	"io/ioutil"
 	"log"
 	"strings"
 	"testing"
@@ -56,7 +57,7 @@ func BenchmarkLogChannelMemoryBackend(b *testing.B) {
 
 func BenchmarkLogLeveled(b *testing.B) {
 	b.StopTimer()
-	backend := SetBackend(NewLogBackend(&bytes.Buffer{}, "", 0))
+	backend := SetBackend(NewLogBackend(ioutil.Discard, "", 0))
 	backend.SetLevel(INFO, "")
 
 	RunLogBenchmark(b)
@@ -64,14 +65,14 @@ func BenchmarkLogLeveled(b *testing.B) {
 
 func BenchmarkLogLogBackend(b *testing.B) {
 	b.StopTimer()
-	backend := SetBackend(NewLogBackend(&bytes.Buffer{}, "", 0))
+	backend := SetBackend(NewLogBackend(ioutil.Discard, "", 0))
 	backend.SetLevel(DEBUG, "")
 	RunLogBenchmark(b)
 }
 
 func BenchmarkLogLogBackendColor(b *testing.B) {
 	b.StopTimer()
-	colorizer := NewLogBackend(&bytes.Buffer{}, "", 0)
+	colorizer := NewLogBackend(ioutil.Discard, "", 0)
 	colorizer.Color = true
 	backend := SetBackend(colorizer)
 	backend.SetLevel(DEBUG, "")
@@ -80,14 +81,14 @@ func BenchmarkLogLogBackendColor(b *testing.B) {
 
 func BenchmarkLogLogBackendStdFlags(b *testing.B) {
 	b.StopTimer()
-	backend := SetBackend(NewLogBackend(&bytes.Buffer{}, "", log.LstdFlags))
+	backend := SetBackend(NewLogBackend(ioutil.Discard, "", log.LstdFlags))
 	backend.SetLevel(DEBUG, "")
 	RunLogBenchmark(b)
 }
 
 func BenchmarkLogLogBackendLongFileFlag(b *testing.B) {
 	b.StopTimer()
-	backend := SetBackend(NewLogBackend(&bytes.Buffer{}, "", log.Llongfile))
+	backend := SetBackend(NewLogBackend(ioutil.Discard, "", log.Llongfile))
 	backend.SetLevel(DEBUG, "")
 	RunLogBenchmark(b)
 }
