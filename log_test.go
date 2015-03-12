@@ -54,6 +54,14 @@ func BenchmarkLogChannelMemoryBackend(b *testing.B) {
 	channelBackend.Flush()
 }
 
+func BenchmarkLogLeveled(b *testing.B) {
+	b.StopTimer()
+	backend := SetBackend(NewLogBackend(&bytes.Buffer{}, "", 0))
+	backend.SetLevel(INFO, "")
+
+	RunLogBenchmark(b)
+}
+
 func BenchmarkLogLogBackend(b *testing.B) {
 	b.StopTimer()
 	backend := SetBackend(NewLogBackend(&bytes.Buffer{}, "", 0))

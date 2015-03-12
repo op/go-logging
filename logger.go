@@ -144,6 +144,10 @@ func (l *Logger) IsEnabledFor(level Level) bool {
 }
 
 func (l *Logger) log(lvl Level, format string, args ...interface{}) {
+	if !l.IsEnabledFor(lvl) {
+		return
+	}
+
 	// Create the logging record and pass it in to the backend
 	record := &Record{
 		Id:     atomic.AddUint64(&sequenceNo, 1),
