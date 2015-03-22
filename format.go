@@ -118,7 +118,7 @@ var (
 	DefaultFormatter Formatter = MustStringFormatter("%{message}")
 
 	// Glog format
-	GlogFormatter Formatter = MustStringFormatter("%{level:.1s}%{time:0102 15:04:05.999999} %{pid} %{shortfile}] %{message}")
+	GlogFormatter Formatter = MustStringFormatter("[%{level:.1s}%{time:0102 15:04:05.999999} %{pid} %{shortfile}] %{message}")
 )
 
 // SetFormatter sets the default formatter for all new backends. A backend will
