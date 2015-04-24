@@ -115,7 +115,7 @@ func Reset() {
 	// if there's no backends at all configured, we could use some tricks to
 	// automatically setup backends based if we have a TTY or not.
 	sequenceNo = 0
-	b := SetBackend(NewLogBackend(os.Stderr, "", log.LstdFlags))
+	b := SetBackend(NewLogBackend(os.Stderr, "", 0))
 	b.SetLevel(DEBUG, "")
 	SetFormatter(DefaultFormatter)
 	timeNow = time.Now
