@@ -210,6 +210,11 @@ func (l *Logger) Error(format string, args ...interface{}) {
 	l.log(ERROR, format, args...)
 }
 
+// Errorf logs a message using ERROR as log level.  It's identical to Error, but doesn't trigger go vet.
+func (l *Logger) Errorf(format string, args ...interface{}) {
+	l.log(ERROR, format, args...)
+}
+
 // Warning logs a message using WARNING as log level.
 func (l *Logger) Warning(format string, args ...interface{}) {
 	l.log(WARNING, format, args...)
