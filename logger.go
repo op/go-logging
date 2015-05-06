@@ -121,23 +121,6 @@ func Reset() {
 	timeNow = time.Now
 }
 
-// InitForTesting is a convenient method when using logging in a test. Once
-// called, the time will be frozen to January 1, 1970 UTC.
-func InitForTesting(level Level) *MemoryBackend {
-	Reset()
-
-	memoryBackend := NewMemoryBackend(10240)
-
-	leveledBackend := AddModuleLevel(memoryBackend)
-	leveledBackend.SetLevel(level, "")
-	SetBackend(leveledBackend)
-
-	timeNow = func() time.Time {
-		return time.Unix(0, 0).UTC()
-	}
-	return memoryBackend
-}
-
 // IsEnabledFor returns true if the logger is enabled for the given level.
 func (l *Logger) IsEnabledFor(level Level) bool {
 	return defaultBackend.IsEnabledFor(level, l.Module)
