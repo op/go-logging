@@ -54,7 +54,7 @@ func (b *multiLogger) SetLevel(level Level, module string) {
 	}
 }
 
-// SetLevel propagates the same level to all backends.
+// SetLevel propagates the same up to level to all backends.
 func (b *multiLogger) SetUpToLevel(level Level, module string) {
 	for _, backend := range b.backends {
 		backend.SetUpToLevel(level, module)
