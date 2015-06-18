@@ -51,6 +51,7 @@ func LogLevel(level string) (Level, error) {
 type Leveled interface {
 	GetLevel(string) Level
 	SetLevel(Level, string)
+	SetUpToLevel(Level, string)
 	IsEnabledFor(Level, string) bool
 }
 
@@ -66,6 +67,7 @@ type moduleLeveled struct {
 	backend   Backend
 	formatter Formatter
 	once      sync.Once
+	upto      bool
 }
 
 // AddModuleLevel wraps a log backend with knobs to have different log levels
@@ -97,12 +99,26 @@ func (l *moduleLeveled) GetLevel(module string) Level {
 
 // SetLevel sets the log level for the given module.
 func (l *moduleLeveled) SetLevel(level Level, module string) {
+	l.setLevel(level, module, false)
+}
+
+// SetLevel sets the log level for the given module.
+func (l *moduleLeveled) SetUpToLevel(level Level, module string) {
+	l.setLevel(level, module, true)
+}
+
+func (l *moduleLeveled) setLevel(level Level, module string, upto bool) {
 	l.levels[module] = level
+	l.upto = upto
 }
 
 // IsEnabledFor will return true if logging is enabled for the given module.
 func (l *moduleLeveled) IsEnabledFor(level Level, module string) bool {
-	return level <= l.GetLevel(module)
+	if l.upto {
+		return level >= l.GetLevel(module)
+	} else {
+		return level <= l.GetLevel(module)
+	}
 }
 
 func (l *moduleLeveled) Log(level Level, calldepth int, rec *Record) (err error) {
