@@ -102,7 +102,7 @@ func (l *moduleLeveled) SetLevel(level Level, module string) {
 	l.setLevel(level, module, false)
 }
 
-// SetLevel sets the log level for the given module.
+// SetLevel sets the log level up to level parameter for the given module.
 func (l *moduleLeveled) SetUpToLevel(level Level, module string) {
 	l.setLevel(level, module, true)
 }
