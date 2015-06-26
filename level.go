@@ -15,8 +15,9 @@ var ErrInvalidLogLevel = errors.New("logger: invalid log level")
 // Level defines all available log levels for log messages.
 type Level int
 
+const NONE Level = -1
+
 const (
-	NONE     Level = -1
 	CRITICAL Level = iota
 	ERROR
 	WARNING
@@ -123,7 +124,7 @@ func (l *moduleLeveled) setLevel(level Level, module string, upto bool, exactlyL
 
 // IsEnabledFor will return true if logging is enabled for the given module.
 func (l *moduleLeveled) IsEnabledFor(level Level, module string) bool {
-	if l.exactlyLevel != -1 {
+	if l.exactlyLevel != NONE {
 		return level == l.GetLevel(module)
 	} else if l.upto {
 		return level >= l.GetLevel(module)
