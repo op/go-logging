@@ -213,6 +213,46 @@ func (l *Logger) Debug(format string, args ...interface{}) {
 	l.log(DEBUG, format, args...)
 }
 
+// IsFatalEnabled returns true if the logger is enabled for fatal messages.
+func (l *Logger) IsFatalEnabled() bool {
+    return defaultBackend.IsEnabledFor(CRITICAL, l.Module)
+}
+
+// IsPanicEnabled returns true if the logger is enabled for panic messages.
+func (l *Logger) IsPanicEnabled() bool {
+    return defaultBackend.IsEnabledFor(CRITICAL, l.Module)
+}
+
+// IsCriticalEnabled returns true if the logger is enabled for critical messages.
+func (l *Logger) IsCriticalEnabled() bool {
+    return defaultBackend.IsEnabledFor(CRITICAL, l.Module)
+}
+
+// IsErrorEnabled returns true if the logger is enabled for error messages.
+func (l *Logger) IsErrorEnabled() bool {
+    return defaultBackend.IsEnabledFor(ERROR, l.Module)
+}
+
+// IsWarningEnabled returns true if the logger is enabled for warning messages.
+func (l *Logger) IsWarningEnabled() bool {
+    return defaultBackend.IsEnabledFor(WARNING, l.Module)
+}
+
+// IsNoticeEnabled returns true if the logger is enabled for notice messages.
+func (l *Logger) IsNoticeEnabled() bool {
+    return defaultBackend.IsEnabledFor(NOTICE, l.Module)
+}
+
+// IsInfoEnabled returns true if the logger is enabled for info messages.
+func (l *Logger) IsInfoEnabled() bool {
+    return defaultBackend.IsEnabledFor(INFO, l.Module)
+}
+
+// IsDebugEnabled returns true if the logger is enabled for debug messages.
+func (l *Logger) IsDebugEnabled() bool {
+    return defaultBackend.IsEnabledFor(DEBUG, l.Module)
+}
+
 func init() {
 	Reset()
 }
