@@ -20,7 +20,7 @@ var boldcolors []string
 type color int
 
 const (
-	colorBlack = (iota + 30)
+	colorBlack = iota + 30
 	colorRed
 	colorGreen
 	colorYellow
@@ -53,7 +53,6 @@ func (b *LogBackend) Log(level Level, calldepth int, rec *Record) error {
 	} else {
 		return b.Logger.Output(calldepth+2, rec.Formatted(calldepth+1))
 	}
-	panic("should not be reached")
 }
 
 func colorSeq(color color) string {
