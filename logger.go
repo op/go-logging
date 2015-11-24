@@ -55,6 +55,7 @@ type Record struct {
 	formatted string
 }
 
+// Formatted returns the formatted log record string.
 func (r *Record) Formatted(calldepth int) string {
 	if r.formatted == "" {
 		var buf bytes.Buffer
@@ -64,6 +65,7 @@ func (r *Record) Formatted(calldepth int) string {
 	return r.formatted
 }
 
+// Message returns the log record message.
 func (r *Record) Message() string {
 	if r.message == nil {
 		// Redact the arguments that implements the Redactor interface
@@ -78,6 +80,8 @@ func (r *Record) Message() string {
 	return *r.message
 }
 
+// Logger is the actual logger which creates log records based on the functions
+// called and passes them to the underlying logging backend.
 type Logger struct {
 	Module      string
 	backend     LeveledBackend
@@ -88,12 +92,14 @@ type Logger struct {
 	ExtraCalldepth int
 }
 
+// SetBackend overrides any previously defined backend for this logger.
 func (l *Logger) SetBackend(backend LeveledBackend) {
 	l.backend = backend
 	l.haveBackend = true
 }
 
 // TODO call NewLogger and remove MustGetLogger?
+
 // GetLogger creates and returns a Logger object based on the module name.
 func GetLogger(module string) (*Logger, error) {
 	return &Logger{Module: module}, nil
