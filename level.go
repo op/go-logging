@@ -15,6 +15,8 @@ var ErrInvalidLogLevel = errors.New("logger: invalid log level")
 // Level defines all available log levels for log messages.
 type Level int
 
+const NONE Level = -1
+
 const (
 	CRITICAL Level = iota
 	ERROR
@@ -51,6 +53,8 @@ func LogLevel(level string) (Level, error) {
 type Leveled interface {
 	GetLevel(string) Level
 	SetLevel(Level, string)
+	SetUpToLevel(Level, string)
+	SetExactlyLevel(level Level, module string)
 	IsEnabledFor(Level, string) bool
 }
 
@@ -62,10 +66,12 @@ type LeveledBackend interface {
 }
 
 type moduleLeveled struct {
-	levels    map[string]Level
-	backend   Backend
-	formatter Formatter
-	once      sync.Once
+	levels       map[string]Level
+	backend      Backend
+	formatter    Formatter
+	once         sync.Once
+	upto         bool
+	exactlyLevel Level
 }
 
 // AddModuleLevel wraps a log backend with knobs to have different log levels
@@ -97,12 +103,34 @@ func (l *moduleLeveled) GetLevel(module string) Level {
 
 // SetLevel sets the log level for the given module.
 func (l *moduleLeveled) SetLevel(level Level, module string) {
+	l.setLevel(level, module, false, NONE)
+}
+
+// SetLevel sets the log level up to level parameter for the given module.
+func (l *moduleLeveled) SetUpToLevel(level Level, module string) {
+	l.setLevel(level, module, true, NONE)
+}
+
+// SetLevel sets the log level up to level parameter for the given module.
+func (l *moduleLeveled) SetExactlyLevel(level Level, module string) {
+	l.setLevel(level, module, true, level)
+}
+
+func (l *moduleLeveled) setLevel(level Level, module string, upto bool, exactlyLevel Level) {
 	l.levels[module] = level
+	l.upto = upto
+	l.exactlyLevel = exactlyLevel
 }
 
 // IsEnabledFor will return true if logging is enabled for the given module.
 func (l *moduleLeveled) IsEnabledFor(level Level, module string) bool {
-	return level <= l.GetLevel(module)
+	if l.exactlyLevel != NONE {
+		return level == l.GetLevel(module)
+	} else if l.upto {
+		return level >= l.GetLevel(module)
+	} else {
+		return level <= l.GetLevel(module)
+	}
 }
 
 func (l *moduleLeveled) Log(level Level, calldepth int, rec *Record) (err error) {

@@ -54,6 +54,20 @@ func (b *multiLogger) SetLevel(level Level, module string) {
 	}
 }
 
+// SetLevel propagates the same up to level to all backends.
+func (b *multiLogger) SetUpToLevel(level Level, module string) {
+	for _, backend := range b.backends {
+		backend.SetUpToLevel(level, module)
+	}
+}
+
+// SetLevel sets the log level up to level parameter for the given module.
+func (b *multiLogger) SetExactlyLevel(level Level, module string) {
+	for _, backend := range b.backends {
+		backend.SetExactlyLevel(level, module)
+	}
+}
+
 // IsEnabledFor returns true if any of the backends are enabled for it.
 func (b *multiLogger) IsEnabledFor(level Level, module string) bool {
 	for _, backend := range b.backends {
