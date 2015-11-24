@@ -19,7 +19,7 @@ func Example() {
 	// information to the output, including the used log level and the name of
 	// the function.
 	var format = MustStringFormatter(
-		"%{time:15:04:05.000} %{shortfunc} %{level:.1s} %{message}",
+		`%{time:15:04:05.000} %{shortfunc} %{level:.1s} %{message}`,
 	)
 	backend2Formatter := NewBackendFormatter(backend2, format)
 
