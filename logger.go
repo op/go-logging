@@ -193,8 +193,18 @@ func (l *Logger) Error(format string, args ...interface{}) {
 	l.log(ERROR, format, args...)
 }
 
+// Errorf logs a message using ERROR as log level.
+func (l *Logger) Errorf(format string, args ...interface{}) {
+	l.log(ERROR, format, args...)
+}
+
 // Warning logs a message using WARNING as log level.
 func (l *Logger) Warning(format string, args ...interface{}) {
+	l.log(WARNING, format, args...)
+}
+
+// Warningf logs a message using WARNING as log level.
+func (l *Logger) Warningf(format string, args ...interface{}) {
 	l.log(WARNING, format, args...)
 }
 
@@ -203,13 +213,28 @@ func (l *Logger) Notice(format string, args ...interface{}) {
 	l.log(NOTICE, format, args...)
 }
 
+// Noticef logs a message using NOTICE as log level.
+func (l *Logger) Noticef(format string, args ...interface{}) {
+	l.log(NOTICE, format, args...)
+}
+
 // Info logs a message using INFO as log level.
 func (l *Logger) Info(format string, args ...interface{}) {
 	l.log(INFO, format, args...)
 }
 
+// Infof logs a message using INFO as log level.
+func (l *Logger) Infof(format string, args ...interface{}) {
+	l.log(INFO, format, args...)
+}
+
 // Debug logs a message using DEBUG as log level.
 func (l *Logger) Debug(format string, args ...interface{}) {
+	l.log(DEBUG, format, args...)
+}
+
+// Debugf logs a message using DEBUG as log level.
+func (l *Logger) Debugf(format string, args ...interface{}) {
 	l.log(DEBUG, format, args...)
 }
 

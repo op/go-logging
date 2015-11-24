@@ -57,7 +57,7 @@ func main() {
 	// Set the backends to be used.
 	logging.SetBackend(backend1Leveled, backend2Formatter)
 
-	log.Debug("debug %s", Password("secret"))
+	log.Debugf("debug %s", Password("secret"))
 	log.Info("info")
 	log.Notice("notice")
 	log.Warning("warning")
