@@ -17,29 +17,26 @@ var (
 	setConsoleTextAttributeProc = kernel32DLL.NewProc("SetConsoleTextAttribute")
 )
 
-type color int
-type word uint16
-
 // Character attributes
 // Note:
 // -- The attributes are combined to produce various colors (e.g., Blue + Green will create Cyan).
 //    Clearing all foreground or background colors results in black; setting all creates white.
 // See https://msdn.microsoft.com/en-us/library/windows/desktop/ms682088(v=vs.85).aspx#_win32_character_attributes.
 const (
-	fgBlack     word = 0x0000
-	fgBlue      word = 0x0001
-	fgGreen     word = 0x0002
-	fgCyan      word = 0x0003
-	fgRed       word = 0x0004
-	fgMagenta   word = 0x0005
-	fgYellow    word = 0x0006
-	fgWhite     word = 0x0007
-	fgIntensity word = 0x0008
-	fgMask      word = 0x000F
+	fgBlack     = 0x0000
+	fgBlue      = 0x0001
+	fgGreen     = 0x0002
+	fgCyan      = 0x0003
+	fgRed       = 0x0004
+	fgMagenta   = 0x0005
+	fgYellow    = 0x0006
+	fgWhite     = 0x0007
+	fgIntensity = 0x0008
+	fgMask      = 0x000F
 )
 
 var (
-	colors = []word{
+	colors = []uint16{
 		INFO:     fgWhite,
 		CRITICAL: fgMagenta,
 		ERROR:    fgRed,
@@ -47,7 +44,7 @@ var (
 		NOTICE:   fgGreen,
 		DEBUG:    fgCyan,
 	}
-	boldcolors = []word{
+	boldcolors = []uint16{
 		INFO:     fgWhite | fgIntensity,
 		CRITICAL: fgMagenta | fgIntensity,
 		ERROR:    fgRed | fgIntensity,
@@ -89,8 +86,6 @@ func (b *LogBackend) Log(level Level, calldepth int, rec *Record) error {
 		buf := &bytes.Buffer{}
 		setConsoleTextAttribute(b.f, colors[level])
 		buf.Write([]byte(rec.Formatted(calldepth + 1)))
-		// For some reason, the Go logger arbitrarily decided "2" was the correct
-		// call depth...
 		err := b.Logger.Output(calldepth+2, buf.String())
 		setConsoleTextAttribute(b.f, fgWhite)
 		return err
@@ -101,29 +96,10 @@ func (b *LogBackend) Log(level Level, calldepth int, rec *Record) error {
 // setConsoleTextAttribute sets the attributes of characters written to the
 // console screen buffer by the WriteFile or WriteConsole function.
 // See http://msdn.microsoft.com/en-us/library/windows/desktop/ms686047(v=vs.85).aspx.
-func setConsoleTextAttribute(f file, attribute word) error {
-	r1, r2, err := setConsoleTextAttributeProc.Call(f.Fd(), uintptr(attribute), 0)
-	use(attribute)
-	return checkError(r1, r2, err)
+func setConsoleTextAttribute(f file, attribute uint16) bool {
+	ok, _, _ := setConsoleTextAttributeProc.Call(f.Fd(), uintptr(attribute), 0)
+	return ok != 0
 }
-
-// checkError evaluates the results of a Windows API call and returns the error if it failed.
-func checkError(r1, r2 uintptr, err error) error {
-	// Windows APIs return non-zero to indicate success
-	if r1 != 0 {
-		return nil
-	}
-
-	// Return the error if provided, otherwise default to EINVAL
-	if err != nil {
-		return err
-	}
-	return syscall.EINVAL
-}
-
-// use is a no-op, but the compiler cannot see that it is.
-// Calling use(p) ensures that p is kept live until that point.
-func use(p interface{}) {}
 
 func doFmtVerbLevelColor(layout string, level Level, output io.Writer) {
 }
