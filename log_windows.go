@@ -102,4 +102,6 @@ func setConsoleTextAttribute(f file, attribute uint16) bool {
 }
 
 func doFmtVerbLevelColor(layout string, level Level, output io.Writer) {
+	// TODO not supported on Windows since the io.Writer here is actually a
+	// bytes.Buffer.
 }
