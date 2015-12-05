@@ -9,9 +9,12 @@ import (
 	"bytes"
 	"io"
 	"log"
-	"os"
 	"syscall"
 )
+
+type FileDescriptorGetter interface {
+	Fd() uintptr
+}
 
 var (
 	kernel32DLL                 = syscall.NewLazyDLL("kernel32.dll")
@@ -19,10 +22,10 @@ var (
 )
 
 // TODO initialize here
-var colors []WORD
-var boldcolors []WORD
+var win_colors []WORD
+var win_boldcolors []WORD
 
-type color int
+
 type WORD uint16
 
 const (
@@ -51,14 +54,18 @@ type LogBackend struct {
 }
 
 // NewLogBackend creates a new LogBackend.
-func NewLogBackend(out *os.File, prefix string, flag int) *LogBackend {
-	return &LogBackend{Logger: log.New(out, prefix, flag), Handle: out.Fd()}
+func NewLogBackend(out io.Writer, prefix string, flag int) *LogBackend {
+	var handle uintptr
+	if fdg, ok := interface{}(out).(FileDescriptorGetter); ok {
+		handle = fdg.Fd()
+	}
+	return &LogBackend{Logger: log.New(out, prefix, flag), Handle: handle}
 }
 
 func (b *LogBackend) Log(level Level, calldepth int, rec *Record) error {
 	if b.Color {
 		buf := &bytes.Buffer{}
-		setConsoleTextAttribute(b.Handle, colors[level])
+		setConsoleTextAttribute(b.Handle, win_colors[level])
 		buf.Write([]byte(rec.Formatted(calldepth + 1)))
 		// For some reason, the Go logger arbitrarily decided "2" was the correct
 		// call depth...
@@ -70,7 +77,8 @@ func (b *LogBackend) Log(level Level, calldepth int, rec *Record) error {
 }
 
 func init() {
-	colors = []WORD{
+	init_colors()
+	win_colors = []WORD{
 		INFO:     fgWhite,
 		CRITICAL: fgMagenta,
 		ERROR:    fgRed,
@@ -78,7 +86,7 @@ func init() {
 		NOTICE:   fgGreen,
 		DEBUG:    fgCyan,
 	}
-	boldcolors = []WORD{
+	win_boldcolors = []WORD{
 		INFO:     fgWhite | fgIntensity,
 		CRITICAL: fgMagenta | fgIntensity,
 		ERROR:    fgRed | fgIntensity,
@@ -115,6 +123,3 @@ func checkError(r1, r2 uintptr, err error) error {
 // Calling use(p) ensures that p is kept live until that point.
 func use(p interface{}) {}
 
-func doFmtVerbLevelColor(layout string, level Level, output io.Writer) {
-	// no-op for now. We need the file descriptor to do colors.
-}
