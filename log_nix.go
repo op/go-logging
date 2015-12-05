@@ -13,10 +13,6 @@ import (
 	"log"
 )
 
-// TODO initialize here
-var colors []string
-var boldcolors []string
-
 type color int
 
 const (
@@ -28,6 +24,23 @@ const (
 	colorMagenta
 	colorCyan
 	colorWhite
+)
+
+var (
+	colors = []string{
+		CRITICAL: colorSeq(colorMagenta),
+		ERROR:    colorSeq(colorRed),
+		WARNING:  colorSeq(colorYellow),
+		NOTICE:   colorSeq(colorGreen),
+		DEBUG:    colorSeq(colorCyan),
+	}
+	boldcolors = []string{
+		CRITICAL: colorSeqBold(colorMagenta),
+		ERROR:    colorSeqBold(colorRed),
+		WARNING:  colorSeqBold(colorYellow),
+		NOTICE:   colorSeqBold(colorGreen),
+		DEBUG:    colorSeqBold(colorCyan),
+	}
 )
 
 // LogBackend utilizes the standard log module.
@@ -62,23 +75,6 @@ func colorSeq(color color) string {
 
 func colorSeqBold(color color) string {
 	return fmt.Sprintf("\033[%d;1m", int(color))
-}
-
-func init() {
-	colors = []string{
-		CRITICAL: colorSeq(colorMagenta),
-		ERROR:    colorSeq(colorRed),
-		WARNING:  colorSeq(colorYellow),
-		NOTICE:   colorSeq(colorGreen),
-		DEBUG:    colorSeq(colorCyan),
-	}
-	boldcolors = []string{
-		CRITICAL: colorSeqBold(colorMagenta),
-		ERROR:    colorSeqBold(colorRed),
-		WARNING:  colorSeqBold(colorYellow),
-		NOTICE:   colorSeqBold(colorGreen),
-		DEBUG:    colorSeqBold(colorCyan),
-	}
 }
 
 func doFmtVerbLevelColor(layout string, level Level, output io.Writer) {

@@ -18,10 +18,6 @@ var (
 	setConsoleTextAttributeProc = kernel32DLL.NewProc("SetConsoleTextAttribute")
 )
 
-// TODO initialize here
-var colors []WORD
-var boldcolors []WORD
-
 type color int
 type WORD uint16
 
@@ -41,6 +37,25 @@ const (
 	fgWhite     WORD = 0x0007
 	fgIntensity WORD = 0x0008
 	fgMask      WORD = 0x000F
+)
+
+var (
+	colors = []word{
+		INFO:     fgWhite,
+		CRITICAL: fgMagenta,
+		ERROR:    fgRed,
+		WARNING:  fgYellow,
+		NOTICE:   fgGreen,
+		DEBUG:    fgCyan,
+	}
+	boldcolors = []word{
+		INFO:     fgWhite | fgIntensity,
+		CRITICAL: fgMagenta | fgIntensity,
+		ERROR:    fgRed | fgIntensity,
+		WARNING:  fgYellow | fgIntensity,
+		NOTICE:   fgGreen | fgIntensity,
+		DEBUG:    fgCyan | fgIntensity,
+	}
 )
 
 // LogBackend utilizes the standard log module.
@@ -67,25 +82,6 @@ func (b *LogBackend) Log(level Level, calldepth int, rec *Record) error {
 		return err
 	}
 	return b.Logger.Output(calldepth+2, rec.Formatted(calldepth+1))
-}
-
-func init() {
-	colors = []WORD{
-		INFO:     fgWhite,
-		CRITICAL: fgMagenta,
-		ERROR:    fgRed,
-		WARNING:  fgYellow,
-		NOTICE:   fgGreen,
-		DEBUG:    fgCyan,
-	}
-	boldcolors = []WORD{
-		INFO:     fgWhite | fgIntensity,
-		CRITICAL: fgMagenta | fgIntensity,
-		ERROR:    fgRed | fgIntensity,
-		WARNING:  fgYellow | fgIntensity,
-		NOTICE:   fgGreen | fgIntensity,
-		DEBUG:    fgCyan | fgIntensity,
-	}
 }
 
 // setConsoleTextAttribute sets the attributes of characters written to the
