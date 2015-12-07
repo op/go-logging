@@ -8,26 +8,8 @@ package logging
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"log"
-)
-
-// TODO initialize here
-var colors []string
-var boldcolors []string
-
-type color int
-
-const (
-	colorBlack = iota + 30
-	colorRed
-	colorGreen
-	colorYellow
-	colorBlue
-	colorMagenta
-	colorCyan
-	colorWhite
 )
 
 // LogBackend utilizes the standard log module.
@@ -56,37 +38,3 @@ func (b *LogBackend) Log(level Level, calldepth int, rec *Record) error {
 	return b.Logger.Output(calldepth+2, rec.Formatted(calldepth+1))
 }
 
-func colorSeq(color color) string {
-	return fmt.Sprintf("\033[%dm", int(color))
-}
-
-func colorSeqBold(color color) string {
-	return fmt.Sprintf("\033[%d;1m", int(color))
-}
-
-func init() {
-	colors = []string{
-		CRITICAL: colorSeq(colorMagenta),
-		ERROR:    colorSeq(colorRed),
-		WARNING:  colorSeq(colorYellow),
-		NOTICE:   colorSeq(colorGreen),
-		DEBUG:    colorSeq(colorCyan),
-	}
-	boldcolors = []string{
-		CRITICAL: colorSeqBold(colorMagenta),
-		ERROR:    colorSeqBold(colorRed),
-		WARNING:  colorSeqBold(colorYellow),
-		NOTICE:   colorSeqBold(colorGreen),
-		DEBUG:    colorSeqBold(colorCyan),
-	}
-}
-
-func doFmtVerbLevelColor(layout string, level Level, output io.Writer) {
-	if layout == "bold" {
-		output.Write([]byte(boldcolors[level]))
-	} else if layout == "reset" {
-		output.Write([]byte("\033[0m"))
-	} else {
-		output.Write([]byte(colors[level]))
-	}
-}
