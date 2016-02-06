@@ -32,6 +32,43 @@ func TestLogCalldepth(t *testing.T) {
 	}
 }
 
+func c(log *Logger) { log.Info("test callpath") }
+func b(log *Logger) { c(log) }
+func a(log *Logger) { b(log) }
+
+func rec(log *Logger, r int) {
+	if r == 0 {
+		a(log)
+		return
+	}
+	rec(log, r-1)
+}
+
+func TestLogCallpath(t *testing.T) {
+	buf := &bytes.Buffer{}
+	SetBackend(NewLogBackend(buf, "", log.Lshortfile))
+	SetFormatter(MustStringFormatter("%{callpath} %{message}"))
+	//	SetFormatter(MustStringFormatter("%{callpath} %{message}"))
+
+	log := MustGetLogger("test")
+	rec(log, 6)
+
+	parts := strings.SplitN(buf.String(), " ", 3)
+
+	// Verify that the correct filename is registered by the stdlib logger
+	if !strings.HasPrefix(parts[0], "log_test.go:") {
+		t.Errorf("incorrect filename: %s", parts[0])
+	}
+	// Verify that the correct callpath is registered by go-logging
+	if !strings.HasPrefix(parts[1], "TestLogCallpath.rec...rec.a.b.c") {
+		t.Errorf("incorrect callpath: %s", parts[1])
+	}
+	// Verify that the correct message is registered by go-logging
+	if !strings.HasPrefix(parts[2], "test callpath") {
+		t.Errorf("incorrect message: %s", parts[2])
+	}
+}
+
 func BenchmarkLogMemoryBackendIgnored(b *testing.B) {
 	backend := SetBackend(NewMemoryBackend(1024))
 	backend.SetLevel(INFO, "")
