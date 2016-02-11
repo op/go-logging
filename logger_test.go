@@ -29,9 +29,19 @@ func TestRedact(t *testing.T) {
 	backend := InitForTesting(DEBUG)
 	password := Password("123456")
 	log := MustGetLogger("test")
-	log.Debug("foo %s", password)
+	log.Debug("foo", password)
 	if "foo ******" != MemoryRecordN(backend, 0).Formatted(0) {
 		t.Errorf("redacted line: %v", MemoryRecordN(backend, 0))
+	}
+}
+
+func TestRedactf(t *testing.T) {
+	backend := InitForTesting(DEBUG)
+	password := Password("123456")
+	log := MustGetLogger("test")
+	log.Debugf("foo %s", password)
+	if "foo ******" != MemoryRecordN(backend, 0).Formatted(0) {
+		t.Errorf("redacted line: %v", MemoryRecordN(backend, 0).Formatted(0))
 	}
 }
 
@@ -49,5 +59,4 @@ func TestPrivateBackend(t *testing.T) {
 	if "to private baсkend" == MemoryRecordN(privateBackend, 0).Formatted(0) {
 		t.Error("logged to defaultBackend:", MemoryRecordN(privateBackend, 0))
 	}
-
 }

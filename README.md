@@ -7,6 +7,10 @@ is customizable and supports different logging backends like syslog, file and
 memory. Multiple backends can be utilized with different log levels per backend
 and logger.
 
+**_NOTE:_** backwards compatibility promise have been dropped for master. Please
+vendor this package or use `gopkg.in/op/go-logging.v1`. See
+[changelog](CHANGELOG.md) for details.
+
 ## Example
 
 Let's have a look at an [example](examples/example.go) which demonstrates most

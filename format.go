@@ -238,12 +238,13 @@ func NewStringFormatter(format string) (Formatter, error) {
 	if err != nil {
 		panic(err)
 	}
+	testFmt := "hello %s"
 	r := &Record{
 		Id:     12345,
 		Time:   t,
 		Module: "logger",
 		Args:   []interface{}{"go"},
-		fmt:    "hello %s",
+		fmt:    &testFmt,
 	}
 	if err := fmter.Format(0, r, &bytes.Buffer{}); err != nil {
 		return nil, err
