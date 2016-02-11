@@ -8,7 +8,7 @@ memory. Multiple backends can be utilized with different log levels per backend
 and logger.
 
 **_NOTE:_** backwards compatibility promise have been dropped for master. Please
-vendor this package or use `gopkg.in/op/go-logging.v1`. See
+vendor this package or use `gopkg.in/op/go-logging.v1` for previous version. See
 [changelog](CHANGELOG.md) for details.
 
 ## Example
