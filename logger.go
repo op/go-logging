@@ -41,7 +41,7 @@ var (
 // was created, an increasing id, filename and line and finally the actual
 // formatted log line.
 type Record struct {
-	Id     uint64
+	ID     uint64
 	Time   time.Time
 	Module string
 	Level  Level
@@ -147,7 +147,7 @@ func (l *Logger) log(lvl Level, format *string, args ...interface{}) {
 
 	// Create the logging record and pass it in to the backend
 	record := &Record{
-		Id:     atomic.AddUint64(&sequenceNo, 1),
+		ID:     atomic.AddUint64(&sequenceNo, 1),
 		Time:   timeNow(),
 		Module: l.Module,
 		Level:  lvl,

@@ -240,7 +240,7 @@ func NewStringFormatter(format string) (Formatter, error) {
 	}
 	testFmt := "hello %s"
 	r := &Record{
-		Id:     12345,
+		ID:     12345,
 		Time:   t,
 		Module: "logger",
 		Args:   []interface{}{"go"},
@@ -282,7 +282,7 @@ func (f *stringFormatter) Format(calldepth int, r *Record, output io.Writer) err
 				v = r.Level
 				break
 			case fmtVerbID:
-				v = r.Id
+				v = r.ID
 				break
 			case fmtVerbPid:
 				v = pid

@@ -20,8 +20,8 @@ func TestSequenceNoOverflow(t *testing.T) {
 	log := MustGetLogger("test")
 	log.Debug("test")
 
-	if MemoryRecordN(backend, 0).Id != 0 {
-		t.Errorf("Unexpected sequence no: %v", MemoryRecordN(backend, 0).Id)
+	if MemoryRecordN(backend, 0).ID != 0 {
+		t.Errorf("Unexpected sequence no: %v", MemoryRecordN(backend, 0).ID)
 	}
 }
 

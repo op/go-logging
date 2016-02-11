@@ -12,6 +12,7 @@ version.
 * Make eg. `Info` and `Infof` do different things. You want to change all calls
 	to `Info` with a string format go to `Infof` etc. In many cases, `go vet` will
 	guide you.
+* `Id` in `Record` is now called `ID`
 
 ## 1.0.0 (2013-02-21)
 
