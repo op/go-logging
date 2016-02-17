@@ -44,14 +44,13 @@ func rec(log *Logger, r int) {
 	rec(log, r-1)
 }
 
-func TestLogCallpath(t *testing.T) {
+func testCallpath(t *testing.T, format string, expect string) {
 	buf := &bytes.Buffer{}
 	SetBackend(NewLogBackend(buf, "", log.Lshortfile))
-	SetFormatter(MustStringFormatter("%{callpath} %{message}"))
-	//	SetFormatter(MustStringFormatter("%{callpath} %{message}"))
+	SetFormatter(MustStringFormatter(format))
 
-	log := MustGetLogger("test")
-	rec(log, 6)
+	logger := MustGetLogger("test")
+	rec(logger, 6)
 
 	parts := strings.SplitN(buf.String(), " ", 3)
 
@@ -60,13 +59,22 @@ func TestLogCallpath(t *testing.T) {
 		t.Errorf("incorrect filename: %s", parts[0])
 	}
 	// Verify that the correct callpath is registered by go-logging
-	if !strings.HasPrefix(parts[1], "TestLogCallpath.rec...rec.a.b.c") {
+	if !strings.HasPrefix(parts[1], expect) {
 		t.Errorf("incorrect callpath: %s", parts[1])
 	}
 	// Verify that the correct message is registered by go-logging
 	if !strings.HasPrefix(parts[2], "test callpath") {
 		t.Errorf("incorrect message: %s", parts[2])
 	}
+}
+
+func TestLogCallpath(t *testing.T) {
+	testCallpath(t, "%{callpath} %{message}", "TestLogCallpath.testCallpath.rec...rec.a.b.c")
+	testCallpath(t, "%{callpath:-1} %{message}", "TestLogCallpath.testCallpath.rec...rec.a.b.c")
+	testCallpath(t, "%{callpath:0} %{message}", "TestLogCallpath.testCallpath.rec...rec.a.b.c")
+	testCallpath(t, "%{callpath:1} %{message}", "~.c")
+	testCallpath(t, "%{callpath:2} %{message}", "~.b.c")
+	testCallpath(t, "%{callpath:3} %{message}", "~.a.b.c")
 }
 
 func BenchmarkLogMemoryBackendIgnored(b *testing.B) {
