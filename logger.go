@@ -45,12 +45,12 @@ type Record struct {
 	Time   time.Time
 	Module string
 	Level  Level
+	Fmt    *string
 	Args   []interface{}
 
 	// message is kept as a pointer to have shallow copies update this once
 	// needed.
 	message   *string
-	fmt       *string
 	formatter Formatter
 	formatted string
 }
@@ -75,8 +75,8 @@ func (r *Record) Message() string {
 			}
 		}
 		var buf bytes.Buffer
-		if r.fmt != nil {
-			fmt.Fprintf(&buf, *r.fmt, r.Args...)
+		if r.Fmt != nil {
+			fmt.Fprintf(&buf, *r.Fmt, r.Args...)
 		} else {
 			// use Fprintln to make sure we always get space between arguments
 			fmt.Fprintln(&buf, r.Args...)
@@ -151,7 +151,7 @@ func (l *Logger) log(lvl Level, format *string, args ...interface{}) {
 		Time:   timeNow(),
 		Module: l.Module,
 		Level:  lvl,
-		fmt:    format,
+		Fmt:    format,
 		Args:   args,
 	}
 
