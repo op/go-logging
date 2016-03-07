@@ -58,6 +58,9 @@ func TestMemoryBackend(t *testing.T) {
 		t.Errorf("record length: %d", backend.size)
 	}
 	record := MemoryRecordN(backend, 0)
+	if record.formatted == "" {
+		t.Error("record was not preformated")
+	}
 	if "5" != record.Formatted(0) {
 		t.Errorf("unexpected start: %s", record.Formatted(0))
 	}
@@ -97,6 +100,9 @@ func TestChannelMemoryBackend(t *testing.T) {
 		t.Errorf("record length: %d", backend.size)
 	}
 	record := ChannelMemoryRecordN(backend, 0)
+	if record.formatted == "" {
+		t.Error("record was not preformated")
+	}
 	if "5" != record.Formatted(0) {
 		t.Errorf("unexpected start: %s", record.Formatted(0))
 	}
