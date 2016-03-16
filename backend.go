@@ -4,6 +4,10 @@
 
 package logging
 
+import "io/ioutil"
+
+var NullBackend = AddModuleLevel(NewLogBackend(ioutil.Discard, "", 0))
+
 // defaultBackend is the backend used for all logging calls.
 var defaultBackend LeveledBackend
 
