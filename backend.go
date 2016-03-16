@@ -4,6 +4,11 @@
 
 package logging
 
+import "io/ioutil"
+
+// NullBackend is a backend that discards all writes
+var NullBackend = AddModuleLevel(NewLogBackend(ioutil.Discard, "", 0))
+
 // defaultBackend is the backend used for all logging calls.
 var defaultBackend LeveledBackend
 
