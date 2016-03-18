@@ -61,6 +61,9 @@ func NewMemoryBackend(size int) *MemoryBackend {
 func (b *MemoryBackend) Log(level Level, calldepth int, rec *Record) error {
 	var size int32
 
+	// memoize the formated message so that stack information is preserved
+	rec.Formatted(calldepth + 1)
+
 	n := &node{Record: rec}
 	np := unsafe.Pointer(n)
 
@@ -223,6 +226,9 @@ func (b *ChannelMemoryBackend) Stop() {
 
 // Log implements the Log method required by Backend.
 func (b *ChannelMemoryBackend) Log(level Level, calldepth int, rec *Record) error {
+	// memoize the formated message so that stack information is preserved
+	rec.Formatted(calldepth + 1)
+
 	b.incoming <- rec
 	return nil
 }

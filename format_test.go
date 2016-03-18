@@ -22,7 +22,7 @@ func TestFormat(t *testing.T) {
 	log.Debug("hello")
 
 	line := MemoryRecordN(backend, 0).Formatted(0)
-	if "format_test.go:24 1970-01-01T00:00:00 D 0001 module hello" != line {
+	if "format_test.go:22 1970-01-01T00:00:00 D 0001 module hello" != line {
 		t.Errorf("Unexpected format: %s", line)
 	}
 }
@@ -37,13 +37,15 @@ func getLastLine(backend *MemoryBackend) string {
 }
 
 func realFunc(backend *MemoryBackend) string {
-	return logAndGetLine(backend)
+	MustGetLogger("foo").Debug("hello")
+	return getLastLine(backend)
 }
 
 type structFunc struct{}
 
 func (structFunc) Log(backend *MemoryBackend) string {
-	return logAndGetLine(backend)
+	MustGetLogger("foo").Debug("hello")
+	return getLastLine(backend)
 }
 
 func TestRealFuncFormat(t *testing.T) {
