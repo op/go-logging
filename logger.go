@@ -194,6 +194,11 @@ func (l *Logger) Critical(format string, args ...interface{}) {
 	l.log(CRITICAL, format, args...)
 }
 
+// Criticalf logs a message using CRITICAL as log level.
+func (l *Logger) Criticalf(format string, args ...interface{}) {
+	l.log(CRITICAL, format, args...)
+}
+
 // Error logs a message using ERROR as log level.
 func (l *Logger) Error(format string, args ...interface{}) {
 	l.log(ERROR, format, args...)
