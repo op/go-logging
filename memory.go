@@ -68,21 +68,17 @@ func (b *MemoryBackend) Log(level Level, calldepth int, rec *Record) error {
 	// head will both be nil. When we successfully set the tail and the previous
 	// value was nil, it's safe to set the head to the current value too.
 	for {
-		tailp := b.tail
-		swapped := atomic.CompareAndSwapPointer(
+		tailp := atomic.SwapPointer(
 			&b.tail,
-			tailp,
 			np,
 		)
-		if swapped == true {
-			if tailp == nil {
-				b.head = np
-			} else {
-				(*node)(tailp).next = n
-			}
-			size = atomic.AddInt32(&b.size, 1)
-			break
+		if tailp == nil {
+			b.head = np
+		} else {
+			(*node)(tailp).next = n
 		}
+		size = atomic.AddInt32(&b.size, 1)
+		break
 	}
 
 	// Since one record was added, we might have overflowed the list. Remove
