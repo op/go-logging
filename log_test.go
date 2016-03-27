@@ -9,8 +9,13 @@ import (
 	"io/ioutil"
 	"log"
 	"strings"
+	"sync"
 	"testing"
 )
+
+type syncTestConcurrent struct {
+	start, end sync.WaitGroup
+}
 
 func TestLogCalldepth(t *testing.T) {
 	buf := &bytes.Buffer{}
