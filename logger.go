@@ -91,9 +91,8 @@ func (r *Record) Message() string {
 // Logger is the actual logger which creates log records based on the functions
 // called and passes them to the underlying logging backend.
 type Logger struct {
-	Module      string
-	backend     LeveledBackend
-	haveBackend bool
+	Module  string
+	backend atomic.Value
 
 	// ExtraCallDepth can be used to add additional call depth when getting the
 	// calling function. This is normally used when wrapping a logger.
@@ -102,8 +101,7 @@ type Logger struct {
 
 // SetBackend overrides any previously defined backend for this logger.
 func (l *Logger) SetBackend(backend LeveledBackend) {
-	l.backend = backend
-	l.haveBackend = true
+	l.backend.Store(backend)
 }
 
 // TODO call NewLogger and remove MustGetLogger?
@@ -162,8 +160,8 @@ func (l *Logger) log(lvl Level, format *string, args ...interface{}) {
 	// methods, Info(), Fatal(), etc.
 	// ExtraCallDepth allows this to be extended further up the stack in case we
 	// are wrapping these methods, eg. to expose them package level
-	if l.haveBackend {
-		l.backend.Log(lvl, 2+l.ExtraCalldepth, record)
+	if l.backend.Load() != nil {
+		l.backend.Load().(LeveledBackend).Log(lvl, 2+l.ExtraCalldepth, record)
 		return
 	}
 

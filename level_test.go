@@ -74,3 +74,48 @@ func TestLevelModuleLevel(t *testing.T) {
 		}
 	}
 }
+
+func testConcurrent_SetLevel(i int, sync *syncTestConcurrent, backend interface{}) {
+	sync.start.Done()
+	sync.start.Wait()
+	for j := 0; j < 1000; j++ {
+		leveled := backend.(LeveledBackend)
+		leveled.SetLevel(NOTICE, "")
+		leveled.SetLevel(ERROR, "foo")
+		leveled.SetLevel(INFO, "foo.bar")
+		leveled.SetLevel(WARNING, "bar")
+	}
+	sync.end.Done()
+}
+
+func TestLevelModuleLevel_Concurency(t *testing.T) {
+	backend := NewMemoryBackend(128)
+
+	leveled := AddModuleLevel(backend)
+
+	sync := &syncTestConcurrent{}
+	sync.end.Add(10)
+	sync.start.Add(10)
+	for i := 0; i < 10; i++ {
+		go testConcurrent_SetLevel(i, sync, leveled)
+	}
+	sync.end.Wait()
+
+	expected := []struct {
+		level  Level
+		module string
+	}{
+		{NOTICE, ""},
+		{NOTICE, "something"},
+		{ERROR, "foo"},
+		{INFO, "foo.bar"},
+		{WARNING, "bar"},
+	}
+
+	for _, e := range expected {
+		actual := leveled.GetLevel(e.module)
+		if e.level != actual {
+			t.Errorf("unexpected level in %s: %s != %s", e.module, e.level, actual)
+		}
+	}
+}

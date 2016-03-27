@@ -8,6 +8,7 @@ import (
 	"errors"
 	"strings"
 	"sync"
+	"sync/atomic"
 )
 
 // ErrInvalidLogLevel is used when an invalid log level has been used.
@@ -65,9 +66,11 @@ type LeveledBackend interface {
 	Leveled
 }
 
+type moduleLeveledMap map[string]Level
 type moduleLeveled struct {
-	levels    map[string]Level
-	backend   Backend
+	lock      sync.Mutex
+	levels    atomic.Value
+	backend   atomic.Value
 	formatter Formatter
 	once      sync.Once
 }
@@ -78,19 +81,20 @@ func AddModuleLevel(backend Backend) LeveledBackend {
 	var leveled LeveledBackend
 	var ok bool
 	if leveled, ok = backend.(LeveledBackend); !ok {
-		leveled = &moduleLeveled{
-			levels:  make(map[string]Level),
-			backend: backend,
-		}
+		modLeveled := &moduleLeveled{}
+		modLeveled.levels.Store(make(moduleLeveledMap))
+		modLeveled.backend.Store(backend)
+		leveled = modLeveled
 	}
 	return leveled
 }
 
 // GetLevel returns the log level for the given module.
 func (l *moduleLeveled) GetLevel(module string) Level {
-	level, exists := l.levels[module]
+	levels := l.levels.Load().(moduleLeveledMap)
+	level, exists := levels[module]
 	if exists == false {
-		level, exists = l.levels[""]
+		level, exists = levels[""]
 		// no configuration exists, default to debug
 		if exists == false {
 			level = DEBUG
@@ -101,7 +105,10 @@ func (l *moduleLeveled) GetLevel(module string) Level {
 
 // SetLevel sets the log level for the given module.
 func (l *moduleLeveled) SetLevel(level Level, module string) {
-	l.levels[module] = level
+	levels := l.levels.Load().(moduleLeveledMap)
+	l.lock.Lock()
+	levels[module] = level
+	l.lock.Unlock()
 }
 
 // IsEnabledFor will return true if logging is enabled for the given module.
@@ -113,7 +120,7 @@ func (l *moduleLeveled) Log(level Level, calldepth int, rec *Record) (err error)
 	if l.IsEnabledFor(level, rec.Module) {
 		// TODO get rid of traces of formatter here. BackendFormatter should be used.
 		rec.formatter = l.getFormatterAndCacheCurrent()
-		err = l.backend.Log(level, calldepth+1, rec)
+		err = l.backend.Load().(Backend).Log(level, calldepth+1, rec)
 	}
 	return
 }
