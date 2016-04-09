@@ -248,7 +248,7 @@ func NewStringFormatter(format string) (Formatter, error) {
 		Time:   t,
 		Module: "logger",
 		Args:   []interface{}{"go"},
-		fmt:    &testFmt,
+		Fmt:    &testFmt,
 	}
 	if err := fmter.Format(0, r, &bytes.Buffer{}); err != nil {
 		return nil, err
