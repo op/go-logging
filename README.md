@@ -60,6 +60,9 @@ func main() {
 
 	// Set the backends to be used.
 	logging.SetBackend(backend1Leveled, backend2Formatter)
+	
+	// Set log time to UTC, default is Local
+	logging.SetTimeNow(time.Now().UTC)
 
 	log.Debugf("debug %s", Password("secret"))
 	log.Info("info")

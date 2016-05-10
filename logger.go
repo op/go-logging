@@ -123,6 +123,11 @@ func MustGetLogger(module string) *Logger {
 	return logger
 }
 
+// SetTimeNow configures the time.Time value generated for log time values
+func SetTimeNow(now func () time.Time) {
+	timeNow = now
+}
+
 // Reset restores the internal state of the logging library.
 func Reset() {
 	// TODO make a global Init() method to be less magic? or make it such that
