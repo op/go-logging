@@ -4,7 +4,10 @@
 
 package logging
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 type Password string
 
@@ -58,5 +61,22 @@ func TestPrivateBackend(t *testing.T) {
 	}
 	if "to private baсkend" == MemoryRecordN(privateBackend, 0).Formatted(0) {
 		t.Error("logged to defaultBackend:", MemoryRecordN(privateBackend, 0))
+	}
+}
+
+func TestLogger_SetTimerNow(t *testing.T) {
+	_ = InitForTesting(DEBUG)
+	_ = MustGetLogger("test")
+
+	if now := timeNow(); now != time.Unix(0, 0).UTC() {
+		t.Error("test timeNow incorrect", now)
+	}
+
+	SetTimeNow(func() time.Time {
+		return time.Unix(1, 1)
+	})
+
+	if now := timeNow(); now != time.Unix(1, 1) {
+		t.Error("test timeNow dit not get overwritten", now)
 	}
 }
