@@ -137,7 +137,7 @@ func Reset() {
 
 // IsEnabledFor returns true if the logger is enabled for the given level.
 func (l *Logger) IsEnabledFor(level Level) bool {
-	return defaultBackend.IsEnabledFor(level, l.Module)
+	return (*defaultBackend.Load().(*LeveledBackend)).IsEnabledFor(level, l.Module)
 }
 
 func (l *Logger) log(lvl Level, format *string, args ...interface{}) {
@@ -167,7 +167,7 @@ func (l *Logger) log(lvl Level, format *string, args ...interface{}) {
 		return
 	}
 
-	defaultBackend.Log(lvl, 2+l.ExtraCalldepth, record)
+	(*defaultBackend.Load().(*LeveledBackend)).Log(lvl, 2+l.ExtraCalldepth, record)
 }
 
 // Fatal is equivalent to l.Critical(fmt.Sprint()) followed by a call to os.Exit(1).

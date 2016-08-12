@@ -4,8 +4,12 @@
 
 package logging
 
+import (
+	"sync/atomic"
+)
+
 // defaultBackend is the backend used for all logging calls.
-var defaultBackend LeveledBackend
+var defaultBackend atomic.Value
 
 // Backend is the interface which a log backend need to implement to be able to
 // be used as a logging backend.
@@ -23,17 +27,19 @@ func SetBackend(backends ...Backend) LeveledBackend {
 		backend = MultiLogger(backends...)
 	}
 
-	defaultBackend = AddModuleLevel(backend)
-	return defaultBackend
+	newDefaultBackend := AddModuleLevel(backend)
+	defaultBackend.Store(&newDefaultBackend)
+
+	return *defaultBackend.Load().(*LeveledBackend)
 }
 
 // SetLevel sets the logging level for the specified module. The module
 // corresponds to the string specified in GetLogger.
 func SetLevel(level Level, module string) {
-	defaultBackend.SetLevel(level, module)
+	(*defaultBackend.Load().(*LeveledBackend)).SetLevel(level, module)
 }
 
 // GetLevel returns the logging level for the specified module.
 func GetLevel(module string) Level {
-	return defaultBackend.GetLevel(module)
+	return (*defaultBackend.Load().(*LeveledBackend)).GetLevel(module)
 }
