@@ -60,3 +60,17 @@ func TestPrivateBackend(t *testing.T) {
 		t.Error("logged to defaultBackend:", MemoryRecordN(privateBackend, 0))
 	}
 }
+
+func TestConcurrency(t *testing.T) {
+	logger := MustGetLogger("test")
+	go func() {
+		for i := 0; i < 1000; i++ {
+			SetLevel(Level(DEBUG), "test")
+		}
+	}()
+
+	for i := 0; i < 1000; i++ {
+		logger.Info("")
+	}
+}
+
