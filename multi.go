@@ -63,3 +63,9 @@ func (b *multiLogger) IsEnabledFor(level Level, module string) bool {
 	}
 	return false
 }
+
+func (b *multiLogger) SetFormatter(f Formatter) {
+	for _, backend := range b.backends {
+		backend.SetFormatter(f)
+	}
+}

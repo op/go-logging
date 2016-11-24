@@ -55,6 +55,7 @@ func LogLevel(level string) (Level, error) {
 type Leveled interface {
 	GetLevel(string) Level
 	SetLevel(Level, string)
+	SetFormatter(f Formatter)
 	IsEnabledFor(Level, string) bool
 }
 
@@ -125,4 +126,8 @@ func (l *moduleLeveled) getFormatterAndCacheCurrent() Formatter {
 		}
 	})
 	return l.formatter
+}
+
+func (l *moduleLeveled) SetFormatter(f Formatter) {
+	l.formatter = f
 }
