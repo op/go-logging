@@ -17,6 +17,8 @@ var (
 	setConsoleTextAttributeProc = kernel32DLL.NewProc("SetConsoleTextAttribute")
 )
 
+type WORD uint16
+
 // Character attributes
 // Note:
 // -- The attributes are combined to produce various colors (e.g., Blue + Green will create Cyan).
@@ -36,7 +38,7 @@ const (
 )
 
 var (
-	colors = []uint16{
+	win_colors = []uint16{
 		INFO:     fgWhite,
 		CRITICAL: fgMagenta,
 		ERROR:    fgRed,
@@ -44,7 +46,7 @@ var (
 		NOTICE:   fgGreen,
 		DEBUG:    fgCyan,
 	}
-	boldcolors = []uint16{
+	win_boldcolors = []uint16{
 		INFO:     fgWhite | fgIntensity,
 		CRITICAL: fgMagenta | fgIntensity,
 		ERROR:    fgRed | fgIntensity,
@@ -84,7 +86,7 @@ func NewLogBackend(out io.Writer, prefix string, flag int) *LogBackend {
 func (b *LogBackend) Log(level Level, calldepth int, rec *Record) error {
 	if b.Color && b.f != nil {
 		buf := &bytes.Buffer{}
-		setConsoleTextAttribute(b.f, colors[level])
+		setConsoleTextAttribute(b.f, win_colors[level])
 		buf.Write([]byte(rec.Formatted(calldepth + 1)))
 		err := b.Logger.Output(calldepth+2, buf.String())
 		setConsoleTextAttribute(b.f, fgWhite)
@@ -99,9 +101,4 @@ func (b *LogBackend) Log(level Level, calldepth int, rec *Record) error {
 func setConsoleTextAttribute(f file, attribute uint16) bool {
 	ok, _, _ := setConsoleTextAttributeProc.Call(f.Fd(), uintptr(attribute), 0)
 	return ok != 0
-}
-
-func doFmtVerbLevelColor(layout string, level Level, output io.Writer) {
-	// TODO not supported on Windows since the io.Writer here is actually a
-	// bytes.Buffer.
 }
