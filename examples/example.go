@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/op/go-logging"
+	logging "github.com/op/go-logging"
 )
 
 var log = logging.MustGetLogger("example")
@@ -19,6 +19,7 @@ var format = logging.MustStringFormatter(
 // time this is logged, the Redacted() function will be called.
 type Password string
 
+// Redacted returns a redacted string, used here to mask passwords as an example.
 func (p Password) Redacted() interface{} {
 	return logging.Redact(string(p))
 }
