@@ -25,6 +25,7 @@ import (
 	"os"
 
 	"github.com/op/go-logging"
+	"github.com/mattn/go-colorable"
 )
 
 var log = logging.MustGetLogger("example")
@@ -46,8 +47,14 @@ func (p Password) Redacted() interface{} {
 
 func main() {
 	// For demo purposes, create two backend for os.Stderr.
-	backend1 := logging.NewLogBackend(os.Stderr, "", 0)
-	backend2 := logging.NewLogBackend(os.Stderr, "", 0)
+	// To support windows, a colorable stderr is needed!
+	var stderr io.Writer = os.Stderr
+	if runtime.GOOS == "windows" {
+		stderr = colorable.NewColorableStderr()
+	}
+
+	backend1 := logging.NewLogBackend(stderr, "", 0)
+	backend2 := logging.NewLogBackend(stderr, "", 0)
 
 	// For messages written to backend2 we want to add some additional
 	// information to the output, including the used log level and the name of
