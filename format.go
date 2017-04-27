@@ -183,9 +183,6 @@ type stringFormatter struct {
 // For the 'callpath' verb, the output can be adjusted to limit the printing
 // the stack depth. i.e. '%{callpath:3}' will print '~.a.b.c'
 //
-// Colors on Windows is unfortunately not supported right now and is currently
-// a no-op.
-//
 // There's also a couple of experimental 'verbs'. These are exposed to get
 // feedback and needs a bit of tinkering. Hence, they might change in the
 // future.
