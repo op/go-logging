@@ -33,8 +33,9 @@ var (
 	// Sequence number is incremented and utilized for all log records created.
 	sequenceNo uint64
 
-	// timeNow is a customizable for testing purposes.
-	timeNow = time.Now
+	// TimeNow is is made public to allow to be set external.
+	TimeNow = time.Now
+
 )
 
 // Record represents a log record and contains the timestamp when the record
@@ -132,7 +133,7 @@ func Reset() {
 	b := SetBackend(NewLogBackend(os.Stderr, "", log.LstdFlags))
 	b.SetLevel(DEBUG, "")
 	SetFormatter(DefaultFormatter)
-	timeNow = time.Now
+	TimeNow = time.Now
 }
 
 // IsEnabledFor returns true if the logger is enabled for the given level.
@@ -148,7 +149,7 @@ func (l *Logger) log(lvl Level, format *string, args ...interface{}) {
 	// Create the logging record and pass it in to the backend
 	record := &Record{
 		ID:     atomic.AddUint64(&sequenceNo, 1),
-		Time:   timeNow(),
+		Time:   TimeNow(),
 		Module: l.Module,
 		Level:  lvl,
 		fmt:    format,
