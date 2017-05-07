@@ -26,7 +26,7 @@ func InitForTesting(level Level) *MemoryBackend {
 	leveledBackend.SetLevel(level, "")
 	SetBackend(leveledBackend)
 
-	timeNow = func() time.Time {
+	TimeNow = func() time.Time {
 		return time.Unix(0, 0).UTC()
 	}
 	return memoryBackend
