@@ -97,7 +97,15 @@ func getIdConcat(l *ContextLogger, append string, level int ) string {
 	return buffer.String()
 }
 
-func NewLog(logger Log) Log {
+var logger Log;
+var instanced int32 = 0
+func NewLog(ctx context.Context) Log {
+	if(atomic.CompareAndSwapInt32(&instanced, 0, 1)){
+		logger = MustGetLogger("main")
+	}
+	return NewLogWithContext(ctx, logger)
+}
+func NewLogWithLogger(logger Log) Log {
 
 	ctx := NewContext()
 	var ctxLogger ContextLogger

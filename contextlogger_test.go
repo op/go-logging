@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-func TestNewLog(t *testing.T) {
+func TestNewLogWithLogger(t *testing.T) {
 
 	buff := bytes.Buffer{}
 
@@ -14,18 +14,38 @@ func TestNewLog(t *testing.T) {
 	SetFormatter(MustStringFormatter(`%{level:.3s} %{message}`))
 	SetBackend(NewLogBackend(&buff, "", 0))
 
-	NewLog(logger).Info("x1")
-	NewLog(logger).Infof("x2")
+	NewLogWithLogger(logger).Info("x1")
+	NewLogWithLogger(logger).Infof("x2")
 
-	expectedLog := "INF id=1, m=TestNewLog x1\nINF id=2, m=TestNewLog x2\n"
+	expectedLog := "INF id=1, m=TestNewLogWithLogger x1\nINF id=2, m=TestNewLogWithLogger x2\n"
 	if buff.String() != expectedLog {
 		t.Fail()
 		t.Error("current: " + buff.String())
-		t.Error("expcted: " + expectedLog)
+		t.Error("expected: " + expectedLog)
 	}
 	fmt.Println(buff.String())
 
 }
 
+func TestNewLog(t *testing.T) {
+
+	buff := bytes.Buffer{}
+
+	SetFormatter(MustStringFormatter(`%{level:.3s} %{message}`))
+	SetBackend(NewLogBackend(&buff, "", 0))
+
+	NewLog(NewContext()).Info("y1")
+	NewLog(NewContext()).Infof("y2")
+
+	expectedLog := "INF id=3, m=TestNewLog y1\nINF id=4, m=TestNewLog y2\n"
+
+
+	if buff.String() != expectedLog {
+		t.Fail()
+		t.Error("current: " + buff.String())
+		t.Error("expected: " + expectedLog)
+	}
+	fmt.Println(buff.String())
+}
 
 
