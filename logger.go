@@ -88,6 +88,26 @@ func (r *Record) Message() string {
 	return *r.message
 }
 
+
+type Log interface {
+	Critical(args ...interface{})
+	Criticalf(format string, args ...interface{})
+	Debug(args ...interface{})
+	Debugf(format string, args ...interface{})
+	Error(args ...interface{})
+	Errorf(format string, args ...interface{})
+	Fatal(args ...interface{})
+	Fatalf(format string, args ...interface{})
+	Info(args ...interface{})
+	Infof(format string, args ...interface{})
+	Notice(args ...interface{})
+	Noticef(format string, args ...interface{})
+	Panic(args ...interface{})
+	Panicf(format string, args ...interface{})
+	Warning(args ...interface{})
+	Warningf(format string, args ...interface{})
+}
+
 // Logger is the actual logger which creates log records based on the functions
 // called and passes them to the underlying logging backend.
 type Logger struct {
