@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"runtime"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -132,13 +131,8 @@ func Reset() {
 	// if there's no backends at all configured, we could use some tricks to
 	// automatically setup backends based if we have a TTY or not.
 	sequenceNo = 0
-	if runtime.GOOS == "windows" {
-		b := SetBackend(NewLogBackend(colorable.NewColorableStderr(), "", log.LstdFlags))
-		b.SetLevel(DEBUG, "")
-	} else {
-		b := SetBackend(NewLogBackend(os.Stderr, "", log.LstdFlags))
-		b.SetLevel(DEBUG, "")
-	}
+	b := SetBackend(NewLogBackend(colorable.NewColorableStderr(), "", log.LstdFlags))
+	b.SetLevel(DEBUG, "")
 	SetFormatter(DefaultFormatter)
 	timeNow = time.Now
 }
