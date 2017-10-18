@@ -8,12 +8,16 @@ import (
 
 func TestDebugf(t *testing.T){
 
+	minSize := 20
+
 	buff := new(bytes.Buffer)
 	logger := New(buff, "", log.LstdFlags)
 	logger.Debugf("name=%v", "elvis");
 
-	actual := buff.String()[20:]
-	if actual != "DEBUG m=TestDebugf name=elvis\n" {
+	if buff.Len() < minSize {
+		t.Errorf("log must have %d at least, actual=%s", minSize, buff.String())
+	}
+	if actual := buff.String()[minSize:]; actual != "DEBUG m=TestDebugf name=elvis\n" {
 		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
 	}
 }
