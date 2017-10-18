@@ -1,10 +1,21 @@
 package logging
 
-import "testing"
+import (
+	"testing"
+	"log"
+	"bytes"
+)
 
-func TestDebug(t *testing.T){
-	logger := New()
-	logger.Debugf("name=%s", "elvis");
+func TestDebugf(t *testing.T){
+
+	buff := new(bytes.Buffer)
+	logger := New(buff, "", log.LstdFlags)
+	logger.Debugf("name=%v", "elvis");
+
+	actual := buff.String()[20:]
+	if actual != "DEBUG m=TestDebugf name=elvis\n" {
+		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
+	}
 }
 
 //func TestNewLogWithLogger(t *testing.T) {

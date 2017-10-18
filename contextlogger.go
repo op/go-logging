@@ -3,7 +3,7 @@ package logging
 import (
 	"bytes"
 	"log"
-	"os"
+	"io"
 )
 
 type Printer interface {
@@ -34,13 +34,13 @@ type logPrinter struct {
 	log *log.Logger
 }
 
-func New() Log {
-	l := &nativeLogger{&logPrinter{log:log.New(os.Stderr, "", log.LstdFlags)}}
+func New(out io.Writer, prefix string, flag int) Log {
+	l := &nativeLogger{&logPrinter{log:log.New(out, prefix, flag)}}
 	return l;
 }
 
-func(p *logPrinter) Printf(format string, args ... interface{}) {
-	p.log.Printf(format, args)
+func(p *logPrinter) Printf(format string, args ...interface{}) {
+	p.log.Printf(format, args...)
 }
 
 func (l *nativeLogger) Debug(args ...interface{}) {
@@ -48,7 +48,7 @@ func (l *nativeLogger) Debug(args ...interface{}) {
 }
 
 func (l *nativeLogger) Debugf(format string, args ...interface{}) {
-	l.writer.Printf(withCallerMethod(withLevel(new(bytes.Buffer), "DEBUG")).String(), args...)
+	l.writer.Printf(withFormat(withCallerMethod(withLevel(new(bytes.Buffer), "DEBUG")), format).String(), args...)
 }
 
 func (l *nativeLogger) Info(args ...interface{}) {
@@ -73,6 +73,8 @@ func (l *nativeLogger) Errorf(format string, args ...interface{}) {
 }
 
 const level = 2
+
+// add method caller name to message
 func withCallerMethod(buff *bytes.Buffer) *bytes.Buffer {
 	buff.WriteString("m=")
 	buff.WriteString(GetCallerFunctionNameSkippingAnnonymous(level))
@@ -80,8 +82,15 @@ func withCallerMethod(buff *bytes.Buffer) *bytes.Buffer {
 	return buff;
 }
 
+// adding level to message
 func withLevel(buff *bytes.Buffer, lvl string) *bytes.Buffer {
 	buff.WriteString(lvl)
 	buff.WriteString(" ")
 	return buff;
+}
+
+// adding format string to message
+func withFormat(buff *bytes.Buffer, format string) *bytes.Buffer {
+	buff.WriteString(format)
+	return buff
 }
