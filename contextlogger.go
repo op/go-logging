@@ -7,7 +7,8 @@ import (
 )
 
 type Printer interface {
-	Printf(format string, args ... interface{})
+	Printf(format string, args ...interface{})
+	Print(args ...interface{})
 }
 
 type Log interface {
@@ -15,14 +16,14 @@ type Log interface {
 	Debug(args ...interface{})
 	Debugf(format string, args ...interface{})
 
-	//Info(args ...interface{})
-	//Infof(format string, args ...interface{})
-	//
-	//Warning(args ...interface{})
-	//Warningf(format string, args ...interface{})
-	//
-	//Error(args ...interface{})
-	//Errorf(format string, args ...interface{})
+	Info(args ...interface{})
+	Infof(format string, args ...interface{})
+
+	Warning(args ...interface{})
+	Warningf(format string, args ...interface{})
+
+	Error(args ...interface{})
+	Errorf(format string, args ...interface{})
 
 }
 
@@ -36,15 +37,20 @@ type logPrinter struct {
 
 func New(out io.Writer, prefix string, flag int) Log {
 	l := &nativeLogger{&logPrinter{log:log.New(out, prefix, flag)}}
-	return l;
+		return l;
 }
 
 func(p *logPrinter) Printf(format string, args ...interface{}) {
 	p.log.Printf(format, args...)
 }
 
+func(p *logPrinter) Print(args ...interface{}) {
+	p.log.Print(args...)
+}
+
 func (l *nativeLogger) Debug(args ...interface{}) {
-	l.writer.Printf(withCallerMethod(withLevel(new(bytes.Buffer), "DEBUG")).String(), args...)
+	args = append([]interface{}{withCallerMethod(withLevel(new(bytes.Buffer), "DEBUG")).String()}, args...)
+	l.writer.Print(args...)
 }
 
 func (l *nativeLogger) Debugf(format string, args ...interface{}) {
@@ -52,24 +58,27 @@ func (l *nativeLogger) Debugf(format string, args ...interface{}) {
 }
 
 func (l *nativeLogger) Info(args ...interface{}) {
-	//l.writer.Printf(withCallerMethod(""), args...)
+	args = append([]interface{}{withCallerMethod(withLevel(new(bytes.Buffer), "INFO")).String()}, args...)
+	l.writer.Print(args...)
 }
 func (l *nativeLogger) Infof(format string, args ...interface{}) {
-	//l.writer.Printf(withCallerMethod(format), args...)
+	l.writer.Printf(withFormat(withCallerMethod(withLevel(new(bytes.Buffer), "INFO")), format).String(), args...)
 }
 
 func (l *nativeLogger) Warning(args ...interface{}) {
-	//l.writer.Printf(withCallerMethod(""), args...)
+	args = append([]interface{}{withCallerMethod(withLevel(new(bytes.Buffer), "WARNING")).String()}, args...)
+	l.writer.Print(args...)
 }
 func (l *nativeLogger) Warningf(format string, args ...interface{}) {
-	//l.writer.Printf(withCallerMethod(format), args...)
+	l.writer.Printf(withFormat(withCallerMethod(withLevel(new(bytes.Buffer), "WARNING")), format).String(), args...)
 }
 
 func (l *nativeLogger) Error(args ...interface{}) {
-	//l.writer.Printf(withCallerMethod(""), args...)
+	args = append([]interface{}{withCallerMethod(withLevel(new(bytes.Buffer), "ERROR")).String()}, args...)
+	l.writer.Print(args...)
 }
 func (l *nativeLogger) Errorf(format string, args ...interface{}) {
-	//l.writer.Printf(withCallerMethod(format), args...)
+	l.writer.Printf(withFormat(withCallerMethod(withLevel(new(bytes.Buffer), "ERROR")), format).String(), args...)
 }
 
 const level = 2

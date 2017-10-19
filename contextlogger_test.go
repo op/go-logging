@@ -6,6 +6,22 @@ import (
 	"bytes"
 )
 
+func TestDebug(t *testing.T){
+
+	minSize := 20
+
+	buff := new(bytes.Buffer)
+	logger := New(buff, "", log.LstdFlags)
+	logger.Debug("name=", "elvis");
+
+	if buff.Len() < minSize {
+		t.Errorf("log must have %d at least, actual=%s", minSize, buff.String())
+	}
+	if actual := buff.String()[minSize:]; actual != "DEBUG m=TestDebug name=elvis\n" {
+		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
+	}
+}
+
 func TestDebugf(t *testing.T){
 
 	minSize := 20
@@ -21,6 +37,103 @@ func TestDebugf(t *testing.T){
 		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
 	}
 }
+
+func TestInfo(t *testing.T){
+
+	minSize := 20
+
+	buff := new(bytes.Buffer)
+	logger := New(buff, "", log.LstdFlags)
+	logger.Info("name=", "elvis");
+
+	if buff.Len() < minSize {
+		t.Errorf("log must have %d at least, actual=%s", minSize, buff.String())
+	}
+	if actual := buff.String()[minSize:]; actual != "INFO m=TestInfo name=elvis\n" {
+		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
+	}
+}
+
+func TestInfof(t *testing.T){
+
+	minSize := 20
+
+	buff := new(bytes.Buffer)
+	logger := New(buff, "", log.LstdFlags)
+	logger.Infof("name=%v", "elvis");
+
+	if buff.Len() < minSize {
+		t.Errorf("log must have %d at least, actual=%s", minSize, buff.String())
+	}
+	if actual := buff.String()[minSize:]; actual != "INFO m=TestInfof name=elvis\n" {
+		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
+	}
+}
+
+func TestWarn(t *testing.T){
+
+	minSize := 20
+
+	buff := new(bytes.Buffer)
+	logger := New(buff, "", log.LstdFlags)
+	logger.Warning("name=", "elvis");
+
+	if buff.Len() < minSize {
+		t.Errorf("log must have %d at least, actual=%s", minSize, buff.String())
+	}
+	if actual := buff.String()[minSize:]; actual != "WARNING m=TestWarn name=elvis\n" {
+		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
+	}
+}
+
+func TestWarnf(t *testing.T){
+
+	minSize := 20
+
+	buff := new(bytes.Buffer)
+	logger := New(buff, "", log.LstdFlags)
+	logger.Warningf("name=%v", "elvis");
+
+	if buff.Len() < minSize {
+		t.Errorf("log must have %d at least, actual=%s", minSize, buff.String())
+	}
+	if actual := buff.String()[minSize:]; actual != "WARNING m=TestWarnf name=elvis\n" {
+		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
+	}
+}
+
+func TestError(t *testing.T){
+
+	minSize := 20
+
+	buff := new(bytes.Buffer)
+	logger := New(buff, "", log.LstdFlags)
+	logger.Error("name=", "elvis");
+
+	if buff.Len() < minSize {
+		t.Errorf("log must have %d at least, actual=%s", minSize, buff.String())
+	}
+	if actual := buff.String()[minSize:]; actual != "ERROR m=TestError name=elvis\n" {
+		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
+	}
+}
+
+func TestErrorf(t *testing.T){
+
+	minSize := 20
+
+	buff := new(bytes.Buffer)
+	logger := New(buff, "", log.LstdFlags)
+	logger.Errorf("name=%v", "elvis");
+
+	if buff.Len() < minSize {
+		t.Errorf("log must have %d at least, actual=%s", minSize, buff.String())
+	}
+	if actual := buff.String()[minSize:]; actual != "ERROR m=TestErrorf name=elvis\n" {
+		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
+	}
+}
+
 
 //func TestNewLogWithLogger(t *testing.T) {
 //
