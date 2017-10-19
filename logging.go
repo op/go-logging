@@ -65,10 +65,16 @@ func Errorf(format string, args ...interface{}){
 	l.Errorf(format, args...)
 }
 
+//
+// Change actual logger
+//
 func SetLog(logger Log){
 	l = logger
 }
 
+//
+// Returns current logs
+//
 func GetLog() Log {
 	return l
 }
