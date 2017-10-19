@@ -2,50 +2,16 @@ package logging
 
 import (
 	"bytes"
-	"log"
 	"io"
 )
-
-type Printer interface {
-	Printf(format string, args ...interface{})
-	Print(args ...interface{})
-}
-
-type Log interface {
-
-	Debug(args ...interface{})
-	Debugf(format string, args ...interface{})
-
-	Info(args ...interface{})
-	Infof(format string, args ...interface{})
-
-	Warning(args ...interface{})
-	Warningf(format string, args ...interface{})
-
-	Error(args ...interface{})
-	Errorf(format string, args ...interface{})
-
-}
 
 type nativeLogger struct {
 	writer Printer
 }
 
-type logPrinter struct {
-	log *log.Logger
-}
-
 func New(out io.Writer, prefix string, flag int) Log {
-	l := &nativeLogger{&logPrinter{log:log.New(out, prefix, flag)}}
-		return l;
-}
-
-func(p *logPrinter) Printf(format string, args ...interface{}) {
-	p.log.Printf(format, args...)
-}
-
-func(p *logPrinter) Print(args ...interface{}) {
-	p.log.Print(args...)
+	l := &nativeLogger{&gologPrinter{log:NewGologPrinter(out, prefix, flag)}}
+	return l;
 }
 
 func (l *nativeLogger) Debug(args ...interface{}) {
