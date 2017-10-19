@@ -16,8 +16,8 @@ func(p *gologPrinter) Printf(format string, args ...interface{}) {
 	p.log.Printf(format, args...)
 }
 
-func(p *gologPrinter) Print(args ...interface{}) {
-	p.log.Print(args...)
+func(p *gologPrinter) Println(args ...interface{}) {
+	p.log.Println(args...)
 }
 
 func(p *gologPrinter) SetFlags(flags int){

@@ -14,7 +14,7 @@ func New(p Printer) *nativeLogger {
 
 func (l *nativeLogger) Debug(args ...interface{}) {
 	args = append([]interface{}{withCallerMethod(withLevel(new(bytes.Buffer), "DEBUG")).String()}, args...)
-	l.writer.Print(args...)
+	l.writer.Println(args...)
 }
 
 func (l *nativeLogger) Debugf(format string, args ...interface{}) {
@@ -23,7 +23,7 @@ func (l *nativeLogger) Debugf(format string, args ...interface{}) {
 
 func (l *nativeLogger) Info(args ...interface{}) {
 	args = append([]interface{}{withCallerMethod(withLevel(new(bytes.Buffer), "INFO")).String()}, args...)
-	l.writer.Print(args...)
+	l.writer.Println(args...)
 }
 func (l *nativeLogger) Infof(format string, args ...interface{}) {
 	l.writer.Printf(withFormat(withCallerMethod(withLevel(new(bytes.Buffer), "INFO")), format).String(), args...)
@@ -31,7 +31,7 @@ func (l *nativeLogger) Infof(format string, args ...interface{}) {
 
 func (l *nativeLogger) Warning(args ...interface{}) {
 	args = append([]interface{}{withCallerMethod(withLevel(new(bytes.Buffer), "WARNING")).String()}, args...)
-	l.writer.Print(args...)
+	l.writer.Println(args...)
 }
 func (l *nativeLogger) Warningf(format string, args ...interface{}) {
 	l.writer.Printf(withFormat(withCallerMethod(withLevel(new(bytes.Buffer), "WARNING")), format).String(), args...)
@@ -39,7 +39,7 @@ func (l *nativeLogger) Warningf(format string, args ...interface{}) {
 
 func (l *nativeLogger) Error(args ...interface{}) {
 	args = append([]interface{}{withCallerMethod(withLevel(new(bytes.Buffer), "ERROR")).String()}, args...)
-	l.writer.Print(args...)
+	l.writer.Println(args...)
 }
 func (l *nativeLogger) Errorf(format string, args ...interface{}) {
 	l.writer.Printf(withFormat(withCallerMethod(withLevel(new(bytes.Buffer), "ERROR")), format).String(), args...)

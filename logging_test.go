@@ -3,6 +3,7 @@ package logging
 import (
 	"testing"
 	"bytes"
+	"os"
 )
 
 func TestDebug(t *testing.T){
@@ -201,4 +202,15 @@ func GetStaticLoggerAndDisableTimeLogging(buff *bytes.Buffer) Log {
 	printer := logger.writer.(*gologPrinter)
 	printer.SetOutput(buff)
 	return logger
+}
+
+func ExampleDebugf() {
+	printer := GetLog().(*nativeLogger).writer.(*gologPrinter)
+	printer.SetFlags(0)
+	printer.SetOutput(os.Stdout)
+	
+	Debugf("name=%q, age=%d", "John\nZucky", 21)
+
+	// Output:
+	// DEBUG m=Debugf name="John\nZucky", age=21
 }
