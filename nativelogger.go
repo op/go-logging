@@ -2,16 +2,14 @@ package logging
 
 import (
 	"bytes"
-	"io"
 )
 
 type nativeLogger struct {
 	writer Printer
 }
 
-func New(out io.Writer, prefix string, flag int) Log {
-	l := &nativeLogger{&gologPrinter{log:NewGologPrinter(out, prefix, flag)}}
-	return l;
+func New(p Printer) *nativeLogger {
+	return &nativeLogger{p}
 }
 
 func (l *nativeLogger) Debug(args ...interface{}) {

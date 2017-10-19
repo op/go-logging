@@ -20,6 +20,10 @@ func(p *gologPrinter) Print(args ...interface{}) {
 	p.log.Print(args...)
 }
 
-func NewGologPrinter(out io.Writer, prefix string, flag int) *log.Logger {
-	return log.New(out, prefix, flag)
+func(p *gologPrinter) SetFlags(flags int){
+	p.log.SetFlags(flags)
+}
+
+func NewGologPrinter(out io.Writer, prefix string, flag int) *gologPrinter {
+	return &gologPrinter{log: log.New(out, prefix, flag)}
 }

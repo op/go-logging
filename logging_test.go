@@ -8,7 +8,7 @@ import (
 func TestDebug(t *testing.T){
 
 	buff := new(bytes.Buffer)
-	logger := New(buff, "", 0)
+	logger := NewNoFlagInstance(buff)
 	logger.Debug("name=", "elvis");
 
 	if actual := buff.String(); actual != "DEBUG m=TestDebug name=elvis\n" {
@@ -19,7 +19,7 @@ func TestDebug(t *testing.T){
 func TestDebugf(t *testing.T){
 
 	buff := new(bytes.Buffer)
-	logger := New(buff, "", 0)
+	logger := NewNoFlagInstance(buff)
 	logger.Debugf("name=%v", "elvis");
 
 	if actual := buff.String(); actual != "DEBUG m=TestDebugf name=elvis\n" {
@@ -30,7 +30,7 @@ func TestDebugf(t *testing.T){
 func TestInfo(t *testing.T){
 
 	buff := new(bytes.Buffer)
-	logger := New(buff, "", 0)
+	logger := NewNoFlagInstance(buff)
 	logger.Info("name=", "elvis");
 
 	if actual := buff.String(); actual != "INFO m=TestInfo name=elvis\n" {
@@ -41,7 +41,7 @@ func TestInfo(t *testing.T){
 func TestInfof(t *testing.T){
 
 	buff := new(bytes.Buffer)
-	logger := New(buff, "", 0)
+	logger := NewNoFlagInstance(buff)
 	logger.Infof("name=%v", "elvis");
 
 	if actual := buff.String(); actual != "INFO m=TestInfof name=elvis\n" {
@@ -52,7 +52,7 @@ func TestInfof(t *testing.T){
 func TestWarn(t *testing.T){
 
 	buff := new(bytes.Buffer)
-	logger := New(buff, "", 0)
+	logger := NewNoFlagInstance(buff)
 	logger.Warning("name=", "elvis");
 
 	if actual := buff.String(); actual != "WARNING m=TestWarn name=elvis\n" {
@@ -63,7 +63,7 @@ func TestWarn(t *testing.T){
 func TestWarnf(t *testing.T){
 
 	buff := new(bytes.Buffer)
-	logger := New(buff, "", 0)
+	logger := NewNoFlagInstance(buff)
 	logger.Warningf("name=%v", "elvis");
 
 	if actual := buff.String(); actual != "WARNING m=TestWarnf name=elvis\n" {
@@ -74,7 +74,7 @@ func TestWarnf(t *testing.T){
 func TestError(t *testing.T){
 
 	buff := new(bytes.Buffer)
-	logger := New(buff, "", 0)
+	logger := NewNoFlagInstance(buff)
 	logger.Error("name=", "elvis");
 
 	if actual := buff.String(); actual != "ERROR m=TestError name=elvis\n" {
@@ -85,10 +85,14 @@ func TestError(t *testing.T){
 func TestErrorf(t *testing.T){
 
 	buff := new(bytes.Buffer)
-	logger := New(buff, "", 0)
+	logger := NewNoFlagInstance(buff)
 	logger.Errorf("name=%v", "elvis");
 
 	if actual := buff.String(); actual != "ERROR m=TestErrorf name=elvis\n" {
 		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
 	}
+}
+
+func NewNoFlagInstance(buff *bytes.Buffer) Log {
+	return New(NewGologPrinter(buff, "", 0));
 }
