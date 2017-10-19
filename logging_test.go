@@ -205,12 +205,19 @@ func GetStaticLoggerAndDisableTimeLogging(buff *bytes.Buffer) Log {
 }
 
 func ExampleDebugf() {
-	printer := GetLog().(*nativeLogger).writer.(*gologPrinter)
-	printer.SetFlags(0)
+	printer := GetLog().Printer().(*gologPrinter)
 	printer.SetOutput(os.Stdout)
-	
+	printer.SetFlags(0)
+
 	Debugf("name=%q, age=%d", "John\nZucky", 21)
 
 	// Output:
 	// DEBUG m=Debugf name="John\nZucky", age=21
+}
+
+func BenchmarkDebugf(b *testing.B) {
+	GetLog().Printer().SetOutput(new(bytes.Buffer))
+	for i:=0; i < b.N; i++ {
+		Debugf("i=%d", i)
+	}
 }

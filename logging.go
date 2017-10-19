@@ -6,11 +6,13 @@ package logging
 import (
 	"os"
 	"log"
+	"io"
 )
 
 type Printer interface {
 	Printf(format string, args ...interface{})
 	Println(args ...interface{})
+	SetOutput(w io.Writer)
 }
 
 //
@@ -29,6 +31,8 @@ type Log interface {
 
 	Error(args ...interface{})
 	Errorf(format string, args ...interface{})
+
+	Printer() Printer
 
 }
 
@@ -63,6 +67,10 @@ func Error(args ...interface{}){
 
 func Errorf(format string, args ...interface{}){
 	l.Errorf(format, args...)
+}
+
+func SetOutput(w io.Writer) {
+	l.Printer().SetOutput(w)
 }
 
 //
