@@ -4,6 +4,7 @@ import (
 	"testing"
 	"bytes"
 	"os"
+	"log"
 )
 
 func TestDebug(t *testing.T){
@@ -12,7 +13,7 @@ func TestDebug(t *testing.T){
 	logger := NewNoFlagInstance(buff)
 	logger.Debug("name=", "elvis");
 
-	if actual := buff.String(); actual != "DEBUG m=TestDebug name=elvis\n" {
+	if actual := buff.String(); actual != "DEBUG m=TestDebug  name= elvis\n" {
 		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
 	}
 }
@@ -34,7 +35,7 @@ func TestInfo(t *testing.T){
 	logger := NewNoFlagInstance(buff)
 	logger.Info("name=", "elvis");
 
-	if actual := buff.String(); actual != "INFO m=TestInfo name=elvis\n" {
+	if actual := buff.String(); actual != "INFO m=TestInfo  name= elvis\n" {
 		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
 	}
 }
@@ -56,7 +57,7 @@ func TestWarn(t *testing.T){
 	logger := NewNoFlagInstance(buff)
 	logger.Warning("name=", "elvis");
 
-	if actual := buff.String(); actual != "WARNING m=TestWarn name=elvis\n" {
+	if actual := buff.String(); actual != "WARNING m=TestWarn  name= elvis\n" {
 		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
 	}
 }
@@ -78,7 +79,7 @@ func TestError(t *testing.T){
 	logger := NewNoFlagInstance(buff)
 	logger.Error("name=", "elvis");
 
-	if actual := buff.String(); actual != "ERROR m=TestError name=elvis\n" {
+	if actual := buff.String(); actual != "ERROR m=TestError  name= elvis\n" {
 		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
 	}
 }
@@ -107,7 +108,7 @@ func TestStaticDebug(t *testing.T){
 	logger := GetStaticLoggerAndDisableTimeLogging(buff)
 	logger.Debug("name=", "elvis");
 
-	expected := "DEBUG m=TestStaticDebug name=elvis\n"
+	expected := "DEBUG m=TestStaticDebug  name= elvis\n"
 	if actual := buff.String(); actual != expected {
 		t.Errorf("log format not expected, expected='%q', actual='%q'", expected, actual)
 	}
@@ -131,7 +132,7 @@ func TestStaticInfo(t *testing.T){
 	logger := GetStaticLoggerAndDisableTimeLogging(buff)
 	logger.Info("name=", "elvis");
 
-	expected := "INFO m=TestStaticInfo name=elvis\n"
+	expected := "INFO m=TestStaticInfo  name= elvis\n"
 	if actual := buff.String(); actual != expected {
 		t.Errorf("log format not expected, expected='%s', actual='%s'", expected, actual)
 	}
@@ -155,7 +156,7 @@ func TestStaticWarn(t *testing.T){
 	logger := GetStaticLoggerAndDisableTimeLogging(buff)
 	logger.Warning("name=", "elvis");
 
-	expected := "WARNING m=TestStaticWarn name=elvis\n"
+	expected := "WARNING m=TestStaticWarn  name= elvis\n"
 	if actual := buff.String(); actual != expected {
 		t.Errorf("log format not expected, expcted='%s', actual='%s'", expected, actual)
 	}
@@ -179,7 +180,7 @@ func TestStaticError(t *testing.T){
 	logger := GetStaticLoggerAndDisableTimeLogging(buff)
 	logger.Error("name=", "elvis");
 
-	expected := "ERROR m=TestStaticError name=elvis\n"
+	expected := "ERROR m=TestStaticError  name= elvis\n"
 	if actual := buff.String(); actual != expected {
 		t.Errorf("log format not expected, expected='%s', actual='%s'", expected, actual)
 	}
@@ -198,8 +199,9 @@ func TestStaticErrorf(t *testing.T){
 }
 
 func GetStaticLoggerAndDisableTimeLogging(buff *bytes.Buffer) Log {
-	logger := GetLog().(*nativeLogger)
-	printer := logger.writer.(*gologPrinter)
+	logger := GetLog()
+	printer := logger.Printer().(*gologPrinter)
+	printer.SetFlags(0)
 	printer.SetOutput(buff)
 	return logger
 }
@@ -216,8 +218,16 @@ func ExampleDebugf() {
 }
 
 func BenchmarkDebugf(b *testing.B) {
+
+	//go pprof.Lookup("block").WriteTo(os.Stdout, 2)
+	//f, err := os.Open("./cpu.prof")
+	//fmt.Println(err)
+	//pprof.StartCPUProfile(f)
+	//defer pprof.StopCPUProfile()
 	GetLog().Printer().SetOutput(new(bytes.Buffer))
+	log.SetOutput(new(bytes.Buffer))
 	for i:=0; i < b.N; i++ {
 		Debugf("i=%d", i)
+		//log.Printf("i=%d", i)
 	}
 }
