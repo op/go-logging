@@ -24,6 +24,10 @@ func(p *gologPrinter) SetFlags(flags int){
 	p.log.SetFlags(flags)
 }
 
+func(p *gologPrinter) SetOutput(out io.Writer){
+	p.log.SetOutput(out)
+}
+
 func NewGologPrinter(out io.Writer, prefix string, flag int) *gologPrinter {
 	return &gologPrinter{log: log.New(out, prefix, flag)}
 }

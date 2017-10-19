@@ -96,3 +96,109 @@ func TestErrorf(t *testing.T){
 func NewNoFlagInstance(buff *bytes.Buffer) Log {
 	return New(NewGologPrinter(buff, "", 0));
 }
+
+//
+// static methods test
+//
+func TestStaticDebug(t *testing.T){
+
+	buff := new(bytes.Buffer)
+	logger := GetStaticLoggerAndDisableTimeLogging(buff)
+	logger.Debug("name=", "elvis");
+
+	expected := "DEBUG m=TestStaticDebug name=elvis\n"
+	if actual := buff.String(); actual != expected {
+		t.Errorf("log format not expected, expected='%q', actual='%q'", expected, actual)
+	}
+}
+
+func TestStaticDebugf(t *testing.T){
+
+	buff := new(bytes.Buffer)
+	logger := GetStaticLoggerAndDisableTimeLogging(buff)
+	logger.Debugf("name=%v", "elvis");
+
+	expected := "DEBUG m=TestStaticDebugf name=elvis\n"
+	if actual := buff.String(); actual != expected {
+		t.Errorf("log format not expected, expected=%s, actual=%s", expected, actual)
+	}
+}
+
+func TestStaticInfo(t *testing.T){
+
+	buff := new(bytes.Buffer)
+	logger := GetStaticLoggerAndDisableTimeLogging(buff)
+	logger.Info("name=", "elvis");
+
+	expected := "INFO m=TestStaticInfo name=elvis\n"
+	if actual := buff.String(); actual != expected {
+		t.Errorf("log format not expected, expected='%s', actual='%s'", expected, actual)
+	}
+}
+
+func TestStaticInfof(t *testing.T){
+
+	buff := new(bytes.Buffer)
+	logger := GetStaticLoggerAndDisableTimeLogging(buff)
+	logger.Infof("name=%v", "elvis");
+
+	expected := "INFO m=TestStaticInfof name=elvis\n"
+	if actual := buff.String(); actual != expected {
+		t.Errorf("log format not expected, expected='%s', actual='%s'", expected, actual)
+	}
+}
+
+func TestStaticWarn(t *testing.T){
+
+	buff := new(bytes.Buffer)
+	logger := GetStaticLoggerAndDisableTimeLogging(buff)
+	logger.Warning("name=", "elvis");
+
+	expected := "WARNING m=TestStaticWarn name=elvis\n"
+	if actual := buff.String(); actual != expected {
+		t.Errorf("log format not expected, expcted='%s', actual='%s'", expected, actual)
+	}
+}
+
+func TestStaticWarnf(t *testing.T){
+
+	buff := new(bytes.Buffer)
+	logger := GetStaticLoggerAndDisableTimeLogging(buff)
+	logger.Warningf("name=%v", "elvis");
+
+	expected := "WARNING m=TestStaticWarnf name=elvis\n"
+	if actual := buff.String(); actual != expected {
+		t.Errorf("log format not expected, expected='%s', actual='%s'", expected, actual)
+	}
+}
+
+func TestStaticError(t *testing.T){
+
+	buff := new(bytes.Buffer)
+	logger := GetStaticLoggerAndDisableTimeLogging(buff)
+	logger.Error("name=", "elvis");
+
+	expected := "ERROR m=TestStaticError name=elvis\n"
+	if actual := buff.String(); actual != expected {
+		t.Errorf("log format not expected, expected='%s', actual='%s'", expected, actual)
+	}
+}
+
+func TestStaticErrorf(t *testing.T){
+
+	buff := new(bytes.Buffer)
+	logger := GetStaticLoggerAndDisableTimeLogging(buff)
+	logger.Errorf("name=%v", "elvis");
+
+	expected := "ERROR m=TestStaticErrorf name=elvis\n"
+	if actual := buff.String(); actual != expected {
+		t.Errorf("log format not expected, expected='%s', actual='%s'", buff.String(), actual)
+	}
+}
+
+func GetStaticLoggerAndDisableTimeLogging(buff *bytes.Buffer) Log {
+	logger := GetLog().(*nativeLogger)
+	printer := logger.writer.(*gologPrinter)
+	printer.SetOutput(buff)
+	return logger
+}
