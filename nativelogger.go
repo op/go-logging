@@ -55,7 +55,7 @@ const level = 3
 // add method caller name to message
 func withCallerMethod(buff *bytes.Buffer) *bytes.Buffer {
 	buff.WriteString("m=")
-	buff.WriteString(trace.GetCallerFunctionNameSkippingAnnonymous(level))
+	buff.WriteString(trace.GetCallerFunctionName(level))
 	buff.WriteString(" ")
 	return buff;
 }
