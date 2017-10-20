@@ -34,13 +34,13 @@ func GetCallerFunctionName(backLevel int) string {
 // backlevel
 // 0 - returns the direct caller name
 // 1 - returns the second to last function caller name and go on
+var rx, _ = regexp.Compile("^func\\d+")
 func GetCallerFunctionNameSkippingAnnonymous(backlevel int) string {
 
 	var name string = "";
 	counter := 0
 	for tryAgain := true; tryAgain; counter++ {
 		name = GetCallerFunctionName(backlevel + 1 + counter)
-		rx, _ := regexp.Compile("^func\\d+")
 		tryAgain = rx.MatchString(name)
 	}
 
