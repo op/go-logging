@@ -2,6 +2,7 @@ package logging
 
 import (
 	"bytes"
+	"github.com/mageddo/go-logging/pkg/trace"
 )
 
 type nativeLogger struct {
@@ -49,12 +50,12 @@ func (l *nativeLogger) Printer() Printer {
 	return l.writer
 }
 
-const level = 2
+const level = 3
 
 // add method caller name to message
 func withCallerMethod(buff *bytes.Buffer) *bytes.Buffer {
 	buff.WriteString("m=")
-	buff.WriteString(GetCallerFunctionNameSkippingAnnonymous(level))
+	buff.WriteString(trace.GetCallerFunctionNameSkippingAnnonymous(level))
 	buff.WriteString(" ")
 	return buff;
 }

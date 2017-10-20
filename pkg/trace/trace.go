@@ -1,4 +1,4 @@
-package logging
+package trace
 
 // returns full package and function name
 // 0 for the caller name, 1 for a up level, etc...
@@ -30,8 +30,10 @@ func GetCallerFunctionName(backLevel int) string {
 }
 
 
-// retorna o nome da funcao chamadora mas se for uma funcao anonima
-// entao busca em um level acima
+// give the name of functions in stack
+// backlevel
+// 0 - returns the direct caller name
+// 1 - returns the second to last function caller name and go on
 func GetCallerFunctionNameSkippingAnnonymous(backlevel int) string {
 
 	var name string = "";

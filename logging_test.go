@@ -13,8 +13,9 @@ func TestDebug(t *testing.T){
 	logger := NewNoFlagInstance(buff)
 	logger.Debug("name=", "elvis");
 
-	if actual := buff.String(); actual != "DEBUG m=TestDebug  name= elvis\n" {
-		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
+	expected := "DEBUG m=TestDebug  name= elvis\n"
+	if actual := buff.String(); actual != expected {
+		t.Errorf("log format not expected, full=%s, actual=%s", expected, actual)
 	}
 }
 
@@ -24,8 +25,9 @@ func TestDebugf(t *testing.T){
 	logger := NewNoFlagInstance(buff)
 	logger.Debugf("name=%v", "elvis");
 
-	if actual := buff.String(); actual != "DEBUG m=TestDebugf name=elvis\n" {
-		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
+	expected := "DEBUG m=TestDebugf name=elvis\n"
+	if actual := buff.String(); actual != expected {
+		t.Errorf("log format not expected, full=%s, actual=%s", expected, actual)
 	}
 }
 
@@ -35,8 +37,9 @@ func TestInfo(t *testing.T){
 	logger := NewNoFlagInstance(buff)
 	logger.Info("name=", "elvis");
 
-	if actual := buff.String(); actual != "INFO m=TestInfo  name= elvis\n" {
-		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
+	expected := "INFO m=TestInfo  name= elvis\n"
+	if actual := buff.String(); actual != expected {
+		t.Errorf("log format not expected, full=%s, actual=%s", expected, actual)
 	}
 }
 
@@ -46,8 +49,9 @@ func TestInfof(t *testing.T){
 	logger := NewNoFlagInstance(buff)
 	logger.Infof("name=%v", "elvis");
 
-	if actual := buff.String(); actual != "INFO m=TestInfof name=elvis\n" {
-		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
+	expected := "INFO m=TestInfof name=elvis\n"
+	if actual := buff.String(); actual != expected {
+		t.Errorf("log format not expected, full=%s, actual=%s", expected, actual)
 	}
 }
 
@@ -57,8 +61,9 @@ func TestWarn(t *testing.T){
 	logger := NewNoFlagInstance(buff)
 	logger.Warning("name=", "elvis");
 
-	if actual := buff.String(); actual != "WARNING m=TestWarn  name= elvis\n" {
-		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
+	expected := "WARNING m=TestWarn  name= elvis\n"
+	if actual := buff.String(); actual != expected {
+		t.Errorf("log format not expected, full=%s, actual=%s", expected, actual)
 	}
 }
 
@@ -68,8 +73,9 @@ func TestWarnf(t *testing.T){
 	logger := NewNoFlagInstance(buff)
 	logger.Warningf("name=%v", "elvis");
 
-	if actual := buff.String(); actual != "WARNING m=TestWarnf name=elvis\n" {
-		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
+	expected := "WARNING m=TestWarnf name=elvis\n"
+	if actual := buff.String(); actual != expected {
+		t.Errorf("log format not expected, full=%s, actual=%s", expected, actual)
 	}
 }
 
@@ -79,8 +85,9 @@ func TestError(t *testing.T){
 	logger := NewNoFlagInstance(buff)
 	logger.Error("name=", "elvis");
 
-	if actual := buff.String(); actual != "ERROR m=TestError  name= elvis\n" {
-		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
+	expected := "ERROR m=TestError  name= elvis\n"
+	if actual := buff.String(); actual != expected {
+		t.Errorf("log format not expected, full=%s, actual=%s", expected, actual)
 	}
 }
 
@@ -90,8 +97,9 @@ func TestErrorf(t *testing.T){
 	logger := NewNoFlagInstance(buff)
 	logger.Errorf("name=%v", "elvis");
 
-	if actual := buff.String(); actual != "ERROR m=TestErrorf name=elvis\n" {
-		t.Errorf("log format not expected, full=%s, actual=%s", buff.String(), actual)
+	expected := "ERROR m=TestErrorf name=elvis\n"
+	if actual := buff.String(); actual != expected {
+		t.Errorf("log format not expected, full=%s, actual=%s", expected, actual)
 	}
 }
 
@@ -134,7 +142,7 @@ func TestStaticInfo(t *testing.T){
 
 	expected := "INFO m=TestStaticInfo  name= elvis\n"
 	if actual := buff.String(); actual != expected {
-		t.Errorf("log format not expected, expected='%s', actual='%s'", expected, actual)
+		t.Errorf("log format not expected, expected='%q', actual='%q'", expected, actual)
 	}
 }
 
@@ -146,7 +154,7 @@ func TestStaticInfof(t *testing.T){
 
 	expected := "INFO m=TestStaticInfof name=elvis\n"
 	if actual := buff.String(); actual != expected {
-		t.Errorf("log format not expected, expected='%s', actual='%s'", expected, actual)
+		t.Errorf("log format not expected, expected='%q', actual='%q'", expected, actual)
 	}
 }
 
@@ -158,7 +166,7 @@ func TestStaticWarn(t *testing.T){
 
 	expected := "WARNING m=TestStaticWarn  name= elvis\n"
 	if actual := buff.String(); actual != expected {
-		t.Errorf("log format not expected, expcted='%s', actual='%s'", expected, actual)
+		t.Errorf("log format not expected, expcted='%q', actual='%q'", expected, actual)
 	}
 }
 
@@ -170,7 +178,7 @@ func TestStaticWarnf(t *testing.T){
 
 	expected := "WARNING m=TestStaticWarnf name=elvis\n"
 	if actual := buff.String(); actual != expected {
-		t.Errorf("log format not expected, expected='%s', actual='%s'", expected, actual)
+		t.Errorf("log format not expected, expected='%q', actual='%q'", expected, actual)
 	}
 }
 
@@ -182,7 +190,7 @@ func TestStaticError(t *testing.T){
 
 	expected := "ERROR m=TestStaticError  name= elvis\n"
 	if actual := buff.String(); actual != expected {
-		t.Errorf("log format not expected, expected='%s', actual='%s'", expected, actual)
+		t.Errorf("log format not expected, expected='%q', actual='%q'", expected, actual)
 	}
 }
 
@@ -194,7 +202,7 @@ func TestStaticErrorf(t *testing.T){
 
 	expected := "ERROR m=TestStaticErrorf name=elvis\n"
 	if actual := buff.String(); actual != expected {
-		t.Errorf("log format not expected, expected='%s', actual='%s'", buff.String(), actual)
+		t.Errorf("log format not expected, expected='%q', actual='%q'", expected, actual)
 	}
 }
 
