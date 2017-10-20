@@ -1,0 +1,9 @@
+version: '2'
+services:
+  go-logging:
+    container_name: go-logging
+    image: golang:1.9
+    volumes:
+      - $PWD:/app/src/github.com/mageddo/go-logging
+    working_dir: /app/src/github.com/mageddo/go-logging
+    command: tail -f /dev/null
