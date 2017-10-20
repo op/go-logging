@@ -6,6 +6,13 @@ import (
 	"regexp"
 )
 
+
+//
+// Return the caller function name
+// 0 -> returns the current caller function
+// 1 -> returns the current caller parent
+// etc.
+//
 var rx, _ = regexp.Compile("\\.func\\d+$")
 func GetCallerFunctionName(backLevel int) string {
 
