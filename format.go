@@ -42,6 +42,7 @@ const (
 	fmtVerbShortfunc
 	fmtVerbCallpath
 	fmtVerbLevelColor
+	fmtVerbEnv
 
 	// Keep last, there are no match for these below.
 	fmtVerbUnknown
@@ -64,6 +65,7 @@ var fmtVerbs = []string{
 	"shortfunc",
 	"callpath",
 	"color",
+	"env",
 }
 
 const rfc3339Milli = "2006-01-02T15:04:05.999Z07:00"
@@ -84,6 +86,7 @@ var defaultVerbsLayout = []string{
 	"s",
 	"0",
 	"",
+	"s",
 }
 
 var (
@@ -154,6 +157,7 @@ type stringFormatter struct {
 // The verbs:
 //
 // General:
+//     %{env}       Environment
 //     %{id}        Sequence number for log message (uint64).
 //     %{pid}       Process id (int)
 //     %{time}      Time when log occurred (time.Time)
@@ -306,6 +310,8 @@ func (f *stringFormatter) Format(calldepth int, r *Record, output io.Writer) err
 			case fmtVerbMessage:
 				v = r.Message()
 				break
+			case fmtVerbEnv:
+				v = os.Getenv("ENV")
 			case fmtVerbLongfile, fmtVerbShortfile:
 				_, file, line, ok := runtime.Caller(calldepth + 1)
 				if !ok {
