@@ -311,7 +311,7 @@ func (f *stringFormatter) Format(calldepth int, r *Record, output io.Writer) err
 				v = r.Message()
 				break
 			case fmtVerbEnv:
-				v = os.Getenv("TMC_ENV")
+				v = os.Getenv("ENV")
 			case fmtVerbLongfile, fmtVerbShortfile:
 				_, file, line, ok := runtime.Caller(calldepth + 1)
 				if !ok {
