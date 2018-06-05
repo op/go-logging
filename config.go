@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"github.com/go-yaml/yaml"
 	"strings"
-	"github.com/op/go-logging"
 )
 
 const (
@@ -52,8 +51,8 @@ func LoadConfigFromFile( configFile string) {
 	}
 }
 
-func buildFormatter(format string) (logging.Formatter, bool) {
-	formatter, err := logging.NewStringFormatter(format)
+func buildFormatter(format string) (Formatter, bool) {
+	formatter, err := NewStringFormatter(format)
 	if err != nil {
 		debugf( "couldn't implement formatter '%s'\n\n%s", format, err)
 		return nil, true
@@ -61,20 +60,20 @@ func buildFormatter(format string) (logging.Formatter, bool) {
 
 	return formatter, false
 }
-func buildStdout(config stdoutConfig) (logging.Backend, bool) {
+func buildStdout(config stdoutConfig) (Backend, bool) {
 	if formatter, err := buildFormatter(config.format); !err {
-		backend := logging.NewLogBackend(os.Stdout, config.prefix, 0)
+		backend := NewLogBackend(os.Stdout, config.prefix, 0)
 		backend.Color = config.color
-		return logging.NewBackendFormatter(backend, formatter), false
+		return NewBackendFormatter(backend, formatter), false
 	}
 	return nil, true
 }
 
-func buildFile(config fileConfig) (logging.Backend, bool) {
+func buildFile(config fileConfig) (Backend, bool) {
 	if formatter, err := buildFormatter(config.format); !err {
 		if target, err1 := os.OpenFile(config.target, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666); err1 == nil {
-			backend := logging.NewLogBackend(target, config.prefix, 0)
-			return logging.NewBackendFormatter(backend, formatter), false
+			backend := NewLogBackend(target, config.prefix, 0)
+			return NewBackendFormatter(backend, formatter), false
 		} else {
 			debugf("couldn't openFile '%s'\n\n%s", config.target, err1)
 		}
@@ -82,17 +81,17 @@ func buildFile(config fileConfig) (logging.Backend, bool) {
 	return nil, true
 }
 
-func buildMemory(config memoryConfig) (logging.Backend, bool) {
-	return logging.NewMemoryBackend(config.size), false
+func buildMemory(config memoryConfig) (Backend, bool) {
+	return NewMemoryBackend(config.size), false
 }
 
-func buildSyslog(config syslogConfig) (logging.Backend, bool) {
+func buildSyslog(config syslogConfig) (Backend, bool) {
 	if config.priority == -1 {
-		if ret, err := logging.NewSyslogBackend(config.prefix); err == nil {
+		if ret, err := NewSyslogBackend(config.prefix); err == nil {
 			return ret, false
 		}
 	} else {
-		if ret, err := logging.NewSyslogBackendPriority(config.prefix, logging.Priority(config.priority)); err == nil {
+		if ret, err := NewSyslogBackendPriority(config.prefix, Priority(config.priority)); err == nil {
 			return ret, false
 		}
 	}
@@ -127,7 +126,7 @@ func (config Config) GetFormatter(name string) (ret string) {
 }
 
 func (config Config) buildAndSetBackends(){
-	result := make([]logging.Backend, 0)
+	result := make([]Backend, 0)
 	for _, name := range config.getBackends() {
 		switch typ := config.getBackend(name).(type) {
 		case stdoutConfig:
@@ -160,7 +159,7 @@ func (config Config) buildAndSetBackends(){
 	} // for _, name range config.getBackends()
 
 	if len(result) > 0 {
-		logging.SetBackend(result...)
+		SetBackend(result...)
 	}
 }
 
@@ -213,7 +212,7 @@ func (config Config) setLoggerLevel() {
 		}
 
 		debugf( "SetLevel\tName: %s\tLevel: %#v", name, config.getLevel(name))
-		logging.SetLevel(config.getLevel(name), module)
+		SetLevel(config.getLevel(name), module)
 	}
 }
 func (config Config) getLoggers() (ret []string){
@@ -227,11 +226,11 @@ func (config Config) getLoggers() (ret []string){
 	return
 }
 
-func (config Config) getLevel(name string) (ret logging.Level) {
+func (config Config) getLevel(name string) (ret Level) {
 	logger := config.Logger[name].(map[interface{}]interface{})
 
 	if val, ok := logger["level"]; ok {
-		if lvl, err := logging.LogLevel(strings.ToUpper(val.(string))); err == nil {
+		if lvl, err := LogLevel(strings.ToUpper(val.(string))); err == nil {
 			ret = lvl
 		}else{
 			debugf("Level for '%s' ist invalid\n%s", name, err)
