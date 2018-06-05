@@ -85,19 +85,6 @@ func buildMemory(config memoryConfig) (Backend, bool) {
 	return NewMemoryBackend(config.size), false
 }
 
-func buildSyslog(config syslogConfig) (Backend, bool) {
-	if config.priority == -1 {
-		if ret, err := NewSyslogBackend(config.prefix); err == nil {
-			return ret, false
-		}
-	} else {
-		if ret, err := NewSyslogBackendPriority(config.prefix, Priority(config.priority)); err == nil {
-			return ret, false
-		}
-	}
-	return nil, true
-}
-
 type Config struct {
 	Formatter map[string]interface{} `yaml:"formatter"`
 	Backend   map[string]interface{} `yaml:"backend"`
