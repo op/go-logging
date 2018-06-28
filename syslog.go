@@ -19,7 +19,9 @@ type SyslogBackend struct {
 // launched command.
 func NewSyslogBackend(prefix string) (b *SyslogBackend, err error) {
 	var w *syslog.Writer
-	w, err = syslog.New(syslog.LOG_CRIT, prefix)
+	if w, err = syslog.Dial("udp", "syslog-server:514", syslog.LOG_CRIT, prefix); err != nil {
+		panic(err)
+	}
 	return &SyslogBackend{w}, err
 }
 
@@ -27,7 +29,9 @@ func NewSyslogBackend(prefix string) (b *SyslogBackend, err error) {
 // syslog priority, like syslog.LOG_LOCAL3|syslog.LOG_DEBUG etc.
 func NewSyslogBackendPriority(prefix string, priority syslog.Priority) (b *SyslogBackend, err error) {
 	var w *syslog.Writer
-	w, err = syslog.New(priority, prefix)
+	if w, err = syslog.Dial("udp", "syslog-server:514", priority, prefix); err != nil {
+		panic(err)
+	}
 	return &SyslogBackend{w}, err
 }
 
