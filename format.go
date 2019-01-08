@@ -385,7 +385,7 @@ func formatCallpath(calldepth int, depth int) string {
 		if i < start {
 			v += "."
 		}
-		if f := runtime.FuncForPC(pc); f != nil {
+		if f := runtime.FuncForPC(pc - 1); f != nil {
 			v += formatFuncName(fmtVerbShortfunc, f.Name())
 		}
 	}
