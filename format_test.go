@@ -7,6 +7,7 @@ package logging
 import (
 	"bytes"
 	"testing"
+	"time"
 )
 
 func TestFormat(t *testing.T) {
@@ -21,10 +22,71 @@ func TestFormat(t *testing.T) {
 	log := MustGetLogger("module")
 	log.Debug("hello")
 
+	// NOTE: this check is dependent on line number!!
 	line := MemoryRecordN(backend, 0).Formatted(0)
-	if "format_test.go:24 1970-01-01T00:00:00 D 0001 module hello" != line {
+	if "format_test.go:26 1970-01-01T00:00:00 D 0001 module hello" != line {
 		t.Errorf("Unexpected format: %s", line)
 	}
+}
+
+func TestStringFormatter(t *testing.T) {
+	_ = InitForTesting(DEBUG)
+
+	var tests = []struct {
+		format   string
+		expected string
+	}{
+		{"%{id}", "138"},
+		{"%{time}", "1970-01-01T00:00:00Z"},
+		{"%{level}", "CRITICAL"},
+		{"%{module}", "circle"},
+		{"%{message}", "light bearer"},
+		{"%{shortfunc}", "testFmtC"},
+		{"%{longfunc}", "testStringFmt.testFmtC"},
+		{"%{shortfile}", "format_test.go:83"},
+
+		{"%{callpath}", "func1.testFmtA.testFmtB.testFmtC"},
+		// NOTE: this check is dependent on line number!!
+		{"%{shortfile} %{time:2006-01-02T15:04:05} %{level:.1s} %{id:04d} %{module} %{message}", "format_test.go:83 1970-01-01T00:00:00 C 0138 circle light bearer"},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.format, func(t *testing.T) {
+			f, err := NewStringFormatter(tc.format)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			fmt := "light %s"
+			r := &Record{
+				ID:     138,
+				Time:   time.Unix(0, 0).UTC(),
+				Module: "circle",
+				Level:  CRITICAL,
+				fmt:    &fmt,
+				Args:   []interface{}{"bearer"},
+			}
+
+			line := testFmtA(f, r)
+			if line != tc.expected {
+				t.Error("expected", tc.expected, "got", line)
+			}
+		})
+	}
+}
+
+type testStringFmt struct{}
+
+func (testStringFmt) testFmtC(f Formatter, r *Record) string {
+	r.formatter = f
+	return r.Formatted(0)
+}
+func (testStringFmt) testFmtB(f Formatter, r *Record) string {
+	return testStringFmt{}.testFmtC(f, r)
+}
+func testFmtA(f Formatter, r *Record) string {
+	return testStringFmt{}.testFmtB(f, r)
 }
 
 func logAndGetLine(backend *MemoryBackend) string {
