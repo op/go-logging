@@ -56,7 +56,7 @@ func TestPrivateBackend(t *testing.T) {
 	if stdBackend.size > 0 {
 		t.Errorf("something in stdBackend, size of backend: %d", stdBackend.size)
 	}
-	if "to private baсkend" == MemoryRecordN(privateBackend, 0).Formatted(0) {
+	if "to private backend" != MemoryRecordN(privateBackend, 0).Formatted(0) {
 		t.Error("logged to defaultBackend:", MemoryRecordN(privateBackend, 0))
 	}
 }
