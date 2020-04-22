@@ -128,11 +128,11 @@ const (
 // ChannelMemoryBackend is very similar to the MemoryBackend, except that it
 // internally utilizes a channel.
 type ChannelMemoryBackend struct {
+	sync.Mutex
 	maxSize    int
 	size       int
 	incoming   chan *Record
 	events     chan event
-	mu         sync.Mutex
 	running    bool
 	flushWg    sync.WaitGroup
 	stopWg     sync.WaitGroup
@@ -156,8 +156,8 @@ func NewChannelMemoryBackend(size int) *ChannelMemoryBackend {
 // Start launches the internal goroutine which starts processing data from the
 // input channel.
 func (b *ChannelMemoryBackend) Start() {
-	b.mu.Lock()
-	defer b.mu.Unlock()
+	b.Lock()
+	defer b.Unlock()
 
 	// Launch the goroutine unless it's already running.
 	if !b.running {
@@ -212,12 +212,12 @@ func (b *ChannelMemoryBackend) Flush() {
 
 // Stop signals the internal goroutine to exit and waits until it have.
 func (b *ChannelMemoryBackend) Stop() {
-	b.mu.Lock()
+	b.Lock()
+	defer b.Unlock()
 	if b.running {
 		b.running = false
 		b.events <- eventStop
 	}
-	b.mu.Unlock()
 	b.stopWg.Wait()
 }
 

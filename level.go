@@ -66,11 +66,11 @@ type LeveledBackend interface {
 }
 
 type moduleLeveled struct {
+	sync.RWMutex
 	levels    map[string]Level
 	backend   Backend
 	formatter Formatter
 	once      sync.Once
-	mutex     sync.Mutex
 }
 
 // AddModuleLevel wraps a log backend with knobs to have different log levels
@@ -82,7 +82,6 @@ func AddModuleLevel(backend Backend) LeveledBackend {
 		leveled = &moduleLeveled{
 			levels:  make(map[string]Level),
 			backend: backend,
-			mutex:   sync.Mutex{},
 		}
 	}
 	return leveled
@@ -90,7 +89,8 @@ func AddModuleLevel(backend Backend) LeveledBackend {
 
 // GetLevel returns the log level for the given module.
 func (l *moduleLeveled) GetLevel(module string) Level {
-	l.mutex.Lock()
+	l.RLock()
+	defer l.RUnlock()
 	level, exists := l.levels[module]
 	if !exists {
 		level, exists = l.levels[""]
@@ -99,15 +99,14 @@ func (l *moduleLeveled) GetLevel(module string) Level {
 			level = DEBUG
 		}
 	}
-	l.mutex.Unlock()
 	return level
 }
 
 // SetLevel sets the log level for the given module.
 func (l *moduleLeveled) SetLevel(level Level, module string) {
-	l.mutex.Lock()
+	l.Lock()
+	defer l.Unlock()
 	l.levels[module] = level
-	l.mutex.Unlock()
 }
 
 // IsEnabledFor will return true if logging is enabled for the given module.
