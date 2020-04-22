@@ -59,7 +59,7 @@ type Record struct {
 func (r *Record) Formatted(calldepth int) string {
 	if r.formatted == "" {
 		var buf bytes.Buffer
-		r.formatter.Format(calldepth+1, r, &buf)
+		_ = r.formatter.Format(calldepth+1, r, &buf)
 		r.formatted = buf.String()
 	}
 	return r.formatted
@@ -70,7 +70,7 @@ func (r *Record) Message() string {
 	if r.message == nil {
 		// Redact the arguments that implements the Redactor interface
 		for i, arg := range r.Args {
-			if redactor, ok := arg.(Redactor); ok == true {
+			if redactor, ok := arg.(Redactor); ok {
 				r.Args[i] = redactor.Redacted()
 			}
 		}
@@ -163,12 +163,12 @@ func (l *Logger) log(lvl Level, format *string, args ...interface{}) {
 	// ExtraCallDepth allows this to be extended further up the stack in case we
 	// are wrapping these methods, eg. to expose them package level
 	if l.haveBackend {
-		l.backend.Log(lvl, 2+l.ExtraCalldepth, record)
+		_ = l.backend.Log(lvl, 2+l.ExtraCalldepth, record)
 		return
 	}
 
 	defaultBackendMutex.Lock()
-	defaultBackend.Log(lvl, 2+l.ExtraCalldepth, record)
+	_ = defaultBackend.Log(lvl, 2+l.ExtraCalldepth, record)
 	defaultBackendMutex.Unlock()
 }
 

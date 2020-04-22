@@ -92,10 +92,10 @@ func AddModuleLevel(backend Backend) LeveledBackend {
 func (l *moduleLeveled) GetLevel(module string) Level {
 	l.mutex.Lock()
 	level, exists := l.levels[module]
-	if exists == false {
+	if !exists {
 		level, exists = l.levels[""]
 		// no configuration exists, default to debug
-		if exists == false {
+		if !exists {
 			level = DEBUG
 		}
 	}
