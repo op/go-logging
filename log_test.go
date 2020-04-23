@@ -60,7 +60,7 @@ func testCallpath(t *testing.T, format string, expect string) {
 	}
 	// Verify that the correct callpath is registered by go-logging
 	if !strings.HasPrefix(parts[1], expect) {
-		t.Errorf("incorrect callpath: %s", parts[1])
+		t.Errorf("incorrect callpath: %s missing prefix %s", parts[1], expect)
 	}
 	// Verify that the correct message is registered by go-logging
 	if !strings.HasPrefix(parts[2], "test callpath") {
@@ -69,12 +69,12 @@ func testCallpath(t *testing.T, format string, expect string) {
 }
 
 func TestLogCallpath(t *testing.T) {
-	testCallpath(t, "%{callpath} %{message}", "TestLogCallpath.testCallpath.rec...rec.a.b.c")
-	testCallpath(t, "%{callpath:-1} %{message}", "TestLogCallpath.testCallpath.rec...rec.a.b.c")
-	testCallpath(t, "%{callpath:0} %{message}", "TestLogCallpath.testCallpath.rec...rec.a.b.c")
+	testCallpath(t, "%{callpath} %{message}", "TestLogCallpath.String.rec...a.b.c")
+	testCallpath(t, "%{callpath:-1} %{message}", "TestLogCallpath.String.rec...a.b.c")
+	testCallpath(t, "%{callpath:0} %{message}", "TestLogCallpath.String.rec...a.b.c")
 	testCallpath(t, "%{callpath:1} %{message}", "~.c")
-	testCallpath(t, "%{callpath:2} %{message}", "~.b.c")
-	testCallpath(t, "%{callpath:3} %{message}", "~.a.b.c")
+	testCallpath(t, "%{callpath:2} %{message}", "~.c.c")
+	testCallpath(t, "%{callpath:3} %{message}", "~.b.c.c")
 }
 
 func BenchmarkLogMemoryBackendIgnored(b *testing.B) {

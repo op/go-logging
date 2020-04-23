@@ -1,6 +1,11 @@
 language: go
 
+script:
+  - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.23.6
+  - golangci-lint run .
+  - go vet .
+  - go test .
+
 go:
-  - 1.0
-  - 1.1
-  - tip
+  - 1.13.x
+  - 1.14.x
