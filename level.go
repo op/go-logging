@@ -26,14 +26,17 @@ const (
 	DEBUG
 )
 
-var levelNames = []string{
-	"CRITICAL",
-	"ERROR",
-	"WARNING",
-	"NOTICE",
-	"INFO",
-	"DEBUG",
-}
+var (
+	lock       sync.Mutex
+	levelNames = []string{
+		"CRITICAL",
+		"ERROR",
+		"WARNING",
+		"NOTICE",
+		"INFO",
+		"DEBUG",
+	}
+)
 
 // String returns the string representation of a logging level.
 func (p Level) String() string {
@@ -75,6 +78,8 @@ type moduleLeveled struct {
 // AddModuleLevel wraps a log backend with knobs to have different log levels
 // for different modules.
 func AddModuleLevel(backend Backend) LeveledBackend {
+	lock.Lock()
+	defer lock.Unlock()
 	var leveled LeveledBackend
 	var ok bool
 	if leveled, ok = backend.(LeveledBackend); !ok {
@@ -88,6 +93,8 @@ func AddModuleLevel(backend Backend) LeveledBackend {
 
 // GetLevel returns the log level for the given module.
 func (l *moduleLeveled) GetLevel(module string) Level {
+	lock.Lock()
+	defer lock.Unlock()
 	level, exists := l.levels[module]
 	if exists == false {
 		level, exists = l.levels[""]
