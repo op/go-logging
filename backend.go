@@ -23,7 +23,9 @@ func SetBackend(backends ...Backend) LeveledBackend {
 		backend = MultiLogger(backends...)
 	}
 
+	lock.Lock()
 	defaultBackend = AddModuleLevel(backend)
+	lock.Unlock()
 	return defaultBackend
 }
 

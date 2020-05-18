@@ -26,14 +26,17 @@ const (
 	DEBUG
 )
 
-var levelNames = []string{
-	"CRITICAL",
-	"ERROR",
-	"WARNING",
-	"NOTICE",
-	"INFO",
-	"DEBUG",
-}
+var (
+	lock       sync.Mutex
+	levelNames = []string{
+		"CRITICAL",
+		"ERROR",
+		"WARNING",
+		"NOTICE",
+		"INFO",
+		"DEBUG",
+	}
+)
 
 // String returns the string representation of a logging level.
 func (p Level) String() string {
