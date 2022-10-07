@@ -1,12 +1,12 @@
 language: go
 
 script:
-  - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.43.0
+  - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.50.0
   - golangci-lint run .
   - go vet .
   - go test .
 
 go:
-  - 1.15.x
-  - 1.16.x
   - 1.17.x
+  - 1.18.x
+  - 1.19.x
