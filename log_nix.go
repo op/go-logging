@@ -1,3 +1,4 @@
+//go:build !windows
 // +build !windows
 
 // Copyright 2013, Örjan Persson. All rights reserved.
@@ -43,4 +44,3 @@ func (b *LogBackend) Log(level Level, calldepth int, rec *Record) error {
 
 	return b.Logger.Output(calldepth+2, rec.Formatted(calldepth+1))
 }
-

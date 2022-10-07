@@ -1,4 +1,6 @@
+//go:build windows
 // +build windows
+
 // Copyright 2013, Örjan Persson. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -22,7 +24,9 @@ type WORD uint16
 // Character attributes
 // Note:
 // -- The attributes are combined to produce various colors (e.g., Blue + Green will create Cyan).
-//    Clearing all foreground or background colors results in black; setting all creates white.
+//
+//	Clearing all foreground or background colors results in black; setting all creates white.
+//
 // See https://msdn.microsoft.com/en-us/library/windows/desktop/ms682088(v=vs.85).aspx#_win32_character_attributes.
 const (
 	fgBlack     = 0x0000
