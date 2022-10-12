@@ -6,7 +6,7 @@ package logging
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"log"
 	"strings"
 	"testing"
@@ -60,7 +60,7 @@ func testCallpath(t *testing.T, format string, expect string) {
 	}
 	// Verify that the correct callpath is registered by go-logging
 	if !strings.HasPrefix(parts[1], expect) {
-		t.Errorf("incorrect callpath: %s", parts[1])
+		t.Errorf("incorrect callpath: %s missing prefix %s", parts[1], expect)
 	}
 	// Verify that the correct message is registered by go-logging
 	if !strings.HasPrefix(parts[2], "test callpath") {
@@ -69,12 +69,12 @@ func testCallpath(t *testing.T, format string, expect string) {
 }
 
 func TestLogCallpath(t *testing.T) {
-	testCallpath(t, "%{callpath} %{message}", "TestLogCallpath.testCallpath.rec...rec.a.b.c")
-	testCallpath(t, "%{callpath:-1} %{message}", "TestLogCallpath.testCallpath.rec...rec.a.b.c")
-	testCallpath(t, "%{callpath:0} %{message}", "TestLogCallpath.testCallpath.rec...rec.a.b.c")
+	testCallpath(t, "%{callpath} %{message}", "TestLogCallpath.String.rec...a.b.c")
+	testCallpath(t, "%{callpath:-1} %{message}", "TestLogCallpath.String.rec...a.b.c")
+	testCallpath(t, "%{callpath:0} %{message}", "TestLogCallpath.String.rec...a.b.c")
 	testCallpath(t, "%{callpath:1} %{message}", "~.c")
-	testCallpath(t, "%{callpath:2} %{message}", "~.b.c")
-	testCallpath(t, "%{callpath:3} %{message}", "~.a.b.c")
+	testCallpath(t, "%{callpath:2} %{message}", "~.c.c")
+	testCallpath(t, "%{callpath:3} %{message}", "~.b.c.c")
 }
 
 func BenchmarkLogMemoryBackendIgnored(b *testing.B) {
@@ -98,20 +98,20 @@ func BenchmarkLogChannelMemoryBackend(b *testing.B) {
 }
 
 func BenchmarkLogLeveled(b *testing.B) {
-	backend := SetBackend(NewLogBackend(ioutil.Discard, "", 0))
+	backend := SetBackend(NewLogBackend(io.Discard, "", 0))
 	backend.SetLevel(INFO, "")
 
 	RunLogBenchmark(b)
 }
 
 func BenchmarkLogLogBackend(b *testing.B) {
-	backend := SetBackend(NewLogBackend(ioutil.Discard, "", 0))
+	backend := SetBackend(NewLogBackend(io.Discard, "", 0))
 	backend.SetLevel(DEBUG, "")
 	RunLogBenchmark(b)
 }
 
 func BenchmarkLogLogBackendColor(b *testing.B) {
-	colorizer := NewLogBackend(ioutil.Discard, "", 0)
+	colorizer := NewLogBackend(io.Discard, "", 0)
 	colorizer.Color = true
 	backend := SetBackend(colorizer)
 	backend.SetLevel(DEBUG, "")
@@ -119,13 +119,13 @@ func BenchmarkLogLogBackendColor(b *testing.B) {
 }
 
 func BenchmarkLogLogBackendStdFlags(b *testing.B) {
-	backend := SetBackend(NewLogBackend(ioutil.Discard, "", log.LstdFlags))
+	backend := SetBackend(NewLogBackend(io.Discard, "", log.LstdFlags))
 	backend.SetLevel(DEBUG, "")
 	RunLogBenchmark(b)
 }
 
 func BenchmarkLogLogBackendLongFileFlag(b *testing.B) {
-	backend := SetBackend(NewLogBackend(ioutil.Discard, "", log.Llongfile))
+	backend := SetBackend(NewLogBackend(io.Discard, "", log.Llongfile))
 	backend.SetLevel(DEBUG, "")
 	RunLogBenchmark(b)
 }
@@ -141,14 +141,14 @@ func RunLogBenchmark(b *testing.B) {
 }
 
 func BenchmarkLogFixed(b *testing.B) {
-	backend := SetBackend(NewLogBackend(ioutil.Discard, "", 0))
+	backend := SetBackend(NewLogBackend(io.Discard, "", 0))
 	backend.SetLevel(DEBUG, "")
 
 	RunLogBenchmarkFixedString(b)
 }
 
 func BenchmarkLogFixedIgnored(b *testing.B) {
-	backend := SetBackend(NewLogBackend(ioutil.Discard, "", 0))
+	backend := SetBackend(NewLogBackend(io.Discard, "", 0))
 	backend.SetLevel(INFO, "")
 	RunLogBenchmarkFixedString(b)
 }

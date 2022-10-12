@@ -1,3 +1,4 @@
+//go:build !windows
 // +build !windows
 
 // Copyright 2013, Örjan Persson. All rights reserved.
@@ -8,39 +9,8 @@ package logging
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"log"
-)
-
-type color int
-
-const (
-	ColorBlack = iota + 30
-	ColorRed
-	ColorGreen
-	ColorYellow
-	ColorBlue
-	ColorMagenta
-	ColorCyan
-	ColorWhite
-)
-
-var (
-	colors = []string{
-		CRITICAL: ColorSeq(ColorMagenta),
-		ERROR:    ColorSeq(ColorRed),
-		WARNING:  ColorSeq(ColorYellow),
-		NOTICE:   ColorSeq(ColorGreen),
-		DEBUG:    ColorSeq(ColorCyan),
-	}
-	boldcolors = []string{
-		CRITICAL: ColorSeqBold(ColorMagenta),
-		ERROR:    ColorSeqBold(ColorRed),
-		WARNING:  ColorSeqBold(ColorYellow),
-		NOTICE:   ColorSeqBold(ColorGreen),
-		DEBUG:    ColorSeqBold(ColorCyan),
-	}
 )
 
 // LogBackend utilizes the standard log module.
@@ -73,37 +43,4 @@ func (b *LogBackend) Log(level Level, calldepth int, rec *Record) error {
 	}
 
 	return b.Logger.Output(calldepth+2, rec.Formatted(calldepth+1))
-}
-
-// ConvertColors takes a list of ints representing colors for log levels and
-// converts them into strings for ANSI color formatting
-func ConvertColors(colors []int, bold bool) []string {
-	converted := []string{}
-	for _, i := range colors {
-		if bold {
-			converted = append(converted, ColorSeqBold(color(i)))
-		} else {
-			converted = append(converted, ColorSeq(color(i)))
-		}
-	}
-
-	return converted
-}
-
-func ColorSeq(color color) string {
-	return fmt.Sprintf("\033[%dm", int(color))
-}
-
-func ColorSeqBold(color color) string {
-	return fmt.Sprintf("\033[%d;1m", int(color))
-}
-
-func doFmtVerbLevelColor(layout string, level Level, output io.Writer) {
-	if layout == "bold" {
-		output.Write([]byte(boldcolors[level]))
-	} else if layout == "reset" {
-		output.Write([]byte("\033[0m"))
-	} else {
-		output.Write([]byte(colors[level]))
-	}
 }

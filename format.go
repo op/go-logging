@@ -154,17 +154,18 @@ type stringFormatter struct {
 // The verbs:
 //
 // General:
-//     %{id}        Sequence number for log message (uint64).
-//     %{pid}       Process id (int)
-//     %{time}      Time when log occurred (time.Time)
-//     %{level}     Log level (Level)
-//     %{module}    Module (string)
-//     %{program}   Basename of os.Args[0] (string)
-//     %{message}   Message (string)
-//     %{longfile}  Full file name and line number: /a/b/c/d.go:23
-//     %{shortfile} Final file name element and line number: d.go:23
-//     %{callpath}  Callpath like main.a.b.c...c  "..." meaning recursive call ~. meaning truncated path
-//     %{color}     ANSI color based on log level
+//
+//	%{id}        Sequence number for log message (uint64).
+//	%{pid}       Process id (int)
+//	%{time}      Time when log occurred (time.Time)
+//	%{level}     Log level (Level)
+//	%{module}    Module (string)
+//	%{program}   Basename of os.Args[0] (string)
+//	%{message}   Message (string)
+//	%{longfile}  Full file name and line number: /a/b/c/d.go:23
+//	%{shortfile} Final file name element and line number: d.go:23
+//	%{callpath}  Callpath like main.a.b.c...c  "..." meaning recursive call ~. meaning truncated path
+//	%{color}     ANSI color based on log level
 //
 // For normal types, the output can be customized by using the 'verbs' defined
 // in the fmt package, eg. '%{id:04d}' to make the id output be '%04d' as the
@@ -191,11 +192,12 @@ type stringFormatter struct {
 // future.
 //
 // Experimental:
-//     %{longpkg}   Full package path, eg. github.com/go-logging
-//     %{shortpkg}  Base package path, eg. go-logging
-//     %{longfunc}  Full function name, eg. littleEndian.PutUint32
-//     %{shortfunc} Base function name, eg. PutUint32
-//     %{callpath}  Call function path, eg. main.a.b.c
+//
+//	%{longpkg}   Full package path, eg. github.com/go-logging
+//	%{shortpkg}  Base package path, eg. go-logging
+//	%{longfunc}  Full function name, eg. littleEndian.PutUint32
+//	%{shortfunc} Base function name, eg. PutUint32
+//	%{callpath}  Call function path, eg. main.a.b.c
 func NewStringFormatter(format string) (Formatter, error) {
 	var fmter = &stringFormatter{}
 
@@ -274,9 +276,9 @@ func (f *stringFormatter) add(verb fmtVerb, layout string) {
 func (f *stringFormatter) Format(calldepth int, r *Record, output io.Writer) error {
 	for _, part := range f.parts {
 		if part.verb == fmtVerbStatic {
-			output.Write([]byte(part.layout))
+			_, _ = output.Write([]byte(part.layout))
 		} else if part.verb == fmtVerbTime {
-			output.Write([]byte(r.Time.Format(part.layout)))
+			_, _ = output.Write([]byte(r.Time.Format(part.layout)))
 		} else if part.verb == fmtVerbLevelColor {
 			doFmtVerbLevelColor(part.layout, r.Level, output)
 		} else if part.verb == fmtVerbCallpath {
@@ -284,28 +286,22 @@ func (f *stringFormatter) Format(calldepth int, r *Record, output io.Writer) err
 			if err != nil {
 				depth = 0
 			}
-			output.Write([]byte(formatCallpath(calldepth+1, depth)))
+			_, _ = output.Write([]byte(formatCallpath(calldepth+1, depth)))
 		} else {
 			var v interface{}
 			switch part.verb {
 			case fmtVerbLevel:
 				v = r.Level
-				break
 			case fmtVerbID:
 				v = r.ID
-				break
 			case fmtVerbPid:
 				v = pid
-				break
 			case fmtVerbProgram:
 				v = program
-				break
 			case fmtVerbModule:
 				v = r.Module
-				break
 			case fmtVerbMessage:
 				v = r.Message()
-				break
 			case fmtVerbLongfile, fmtVerbShortfile:
 				_, file, line, ok := runtime.Caller(calldepth + 1)
 				if !ok {
