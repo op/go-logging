@@ -1,6 +1,7 @@
 ## Golang logging library
 
-[![godoc](http://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/op/go-logging) [![build](https://img.shields.io/travis/op/go-logging.svg?style=flat)](https://travis-ci.org/op/go-logging)
+[![godoc](http://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/op/go-logging)
+[![Build Status](https://github.com/keybase/go-logging/actions/workflows/ci.yml/badge.svg)](https://github.com/keybase/go-logging/actions)
 
 Package logging implements a logging infrastructure for Go. Its output format
 is customizable and supports different logging backends like syslog, file and
@@ -72,11 +73,11 @@ func main() {
 
 ## Installing
 
-### Using *go get*
+### Using _go get_
 
     $ go get github.com/op/go-logging
 
-After this command *go-logging* is ready to use. Its source will be in:
+After this command _go-logging_ is ready to use. Its source will be in:
 
     $GOPATH/src/pkg/github.com/op/go-logging
 
@@ -90,4 +91,4 @@ For docs, see http://godoc.org/github.com/op/go-logging or run:
 
 ## Additional resources
 
-* [wslog](https://godoc.org/github.com/cryptix/go/logging/wslog) -- exposes log messages through a WebSocket.
+- [wslog](https://godoc.org/github.com/cryptix/go/logging/wslog) -- exposes log messages through a WebSocket.
