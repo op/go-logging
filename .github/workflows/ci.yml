@@ -38,12 +38,8 @@ jobs:
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v9.3.0
-        # Go 1.27.2 writes export data v5, which golangci-lint (through v2.14.0)
-        # can't read. Lint the 1.27 job on go1.27.1 until a release can.
-        env:
-          GOTOOLCHAIN: ${{ matrix.go-version == '1.27.x' && 'go1.27.1' || 'local' }}
         with:
-          version: v2.13.2
+          version: v2.15.0
 
       - name: Build
         run: go build -v ./...
